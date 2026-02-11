@@ -11,91 +11,127 @@
 body{
     margin:0;
     font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#0a1f44,#0f3c88,#1b5fc1);
+    background:linear-gradient(135deg,#081c3a,#0f3c88,#1b5fc1);
     color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
     height:100vh;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
 }
 
-.container{
-    text-align:center;
-    width:100%;
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 60px;
 }
 
 .logo{
-    width:120px;
-    margin-bottom:20px;
+    width:100px;
 }
 
-h1{
-    font-size:42px;
-    margin-bottom:50px;
+.bank-name{
+    font-size:32px;
+    font-weight:700;
     letter-spacing:2px;
+}
+
+.clock{
+    font-size:28px;
+    font-weight:600;
+}
+
+.main{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
 .box{
     display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:100px;
+    gap:120px;
 }
 
 .card{
-    width:350px;
-    height:350px;
+    width:380px;
+    height:380px;
     background:rgba(255,255,255,0.08);
-    border-radius:25px;
-    box-shadow:0 25px 60px rgba(0,0,0,0.4);
+    border-radius:30px;
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
+    box-shadow:0 30px 70px rgba(0,0,0,0.4);
     border:1px solid rgba(255,255,255,0.2);
 }
 
 .label{
-    font-size:26px;
-    margin-bottom:20px;
-    letter-spacing:1px;
+    font-size:28px;
+    margin-bottom:25px;
 }
 
 .number{
-    font-size:100px;
+    font-size:120px;
     font-weight:900;
     color:#ffd700;
-    transition:0.3s ease-in-out;
+    text-shadow:0 0 20px rgba(255,215,0,0.8);
+    transition:0.3s ease;
 }
 
 .animate{
     transform:scale(1.15);
 }
+
+footer{
+    background:rgba(0,0,0,0.3);
+    padding:15px 0;
+    font-size:22px;
+    white-space:nowrap;
+    overflow:hidden;
+}
+
+.marquee{
+    display:inline-block;
+    padding-left:100%;
+    animation:marquee 18s linear infinite;
+}
+
+@keyframes marquee{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(-100%); }
+}
 </style>
-    
 </head>
 
 <body>
 
-<div class="container">
+<header>
+    <img src="logo.png" class="logo">
+    <div class="bank-name">BANK PRIMA NADI</div>
+    <div id="clock" class="clock"></div>
+</header>
 
-<img src="logo.png" class="logo">
+<div class="main">
+    <div class="box">
+        <div class="card">
+            <div class="label">TELLER</div>
+            <div id="teller" class="number">0</div>
+        </div>
 
-<h1>Bank Prima Nadi</h1>
-
-<div class="box">
-    <div class="card">
-        <div class="label">TELLER</div>
-        <div id="teller" class="number">0</div>
-    </div>
-
-    <div class="card">
-        <div class="label">CUSTOMER SERVICE</div>
-        <div id="cs" class="number">0</div>
+        <div class="card">
+            <div class="label">CUSTOMER SERVICE</div>
+            <div id="cs" class="number">0</div>
+        </div>
     </div>
 </div>
 
-</div>
+<footer>
+    <div class="marquee">
+        Selamat Datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih atas kepercayaan Anda
+    </div>
+</footer>
 
 <script type="module">
 import { db } from './firebase-config.js';
@@ -108,11 +144,19 @@ function speak(text){
     speechSynthesis.speak(suara);
 }
 
-const tellerRef = ref(db,'antrian/teller');
-const csRef = ref(db,'antrian/cs');
+function updateClock(){
+    const now = new Date();
+    const jam = now.toLocaleTimeString('id-ID');
+    document.getElementById("clock").innerText = jam;
+}
+setInterval(updateClock,1000);
+updateClock();
 
 let lastTeller = 0;
 let lastCS = 0;
+
+const tellerRef = ref(db,'antrian/teller');
+const csRef = ref(db,'antrian/cs');
 
 onValue(tellerRef,(snapshot)=>{
     if(snapshot.exists()){
@@ -145,4 +189,6 @@ onValue(csRef,(snapshot)=>{
 
 </body>
 </html>
+
+
 
