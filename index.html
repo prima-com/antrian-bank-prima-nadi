@@ -1,15 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
   <title>Bank Prima Nadi - Ambil Antrian</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      width: 350px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .teller {
+      background: #00c6ff;
+      color: white;
+    }
+
+    .cs {
+      background: #ff512f;
+      color: white;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    #hasil {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
-  <h2>Ambil Nomor Antrian</h2>
 
-  <button onclick="ambilTeller()">Ambil Antrian Teller</button>
-  <button onclick="ambilCS()">Ambil Antrian CS</button>
+<div class="card">
+  <h1>Bank Prima Nadi</h1>
 
-  <h3 id="hasil"></h3>
+  <button class="teller" onclick="ambilTeller()">Ambil Antrian Teller</button>
+  <button class="cs" onclick="ambilCS()">Ambil Antrian CS</button>
+
+  <div id="hasil"></div>
+</div>
 
 <script type="module">
 import { db } from './firebase-config.js';
@@ -17,28 +87,16 @@ import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 
 window.ambilTeller = async function() {
   const tellerRef = ref(db, 'antrian/teller');
-
   const snapshot = await get(tellerRef);
-  let nomor = 1;
-
-  if (snapshot.exists()) {
-    nomor = snapshot.val() + 1;
-  }
-
+  let nomor = snapshot.exists() ? snapshot.val() + 1 : 1;
   await set(tellerRef, nomor);
   document.getElementById("hasil").innerText = "Nomor Teller: " + nomor;
 };
 
 window.ambilCS = async function() {
   const csRef = ref(db, 'antrian/cs');
-
   const snapshot = await get(csRef);
-  let nomor = 1;
-
-  if (snapshot.exists()) {
-    nomor = snapshot.val() + 1;
-  }
-
+  let nomor = snapshot.exists() ? snapshot.val() + 1 : 1;
   await set(csRef, nomor);
   document.getElementById("hasil").innerText = "Nomor CS: " + nomor;
 };
@@ -46,3 +104,5 @@ window.ambilCS = async function() {
 
 </body>
 </html>
+
+
