@@ -12,7 +12,7 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background: linear-gradient(135deg, #0a1f44, #0f3c88, #1b5fc1);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,19 +21,26 @@
     }
 
     .card {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.08);
       backdrop-filter: blur(15px);
       padding: 40px;
       border-radius: 20px;
       text-align: center;
-      width: 350px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      width: 360px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .logo {
+      width: 90px;
+      margin-bottom: 15px;
     }
 
     h1 {
       margin-bottom: 30px;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
+      letter-spacing: 1px;
     }
 
     button {
@@ -41,44 +48,45 @@
       padding: 15px;
       margin: 10px 0;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: 0.3s;
     }
 
-    .teller {
-      background: #00c6ff;
-      color: white;
-    }
-
-    .cs {
-      background: #ff512f;
-      color: white;
+    .gold {
+      background: linear-gradient(135deg, #d4af37, #f5d76e);
+      color: #1b1b1b;
     }
 
     button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
 
     #hasil {
-      margin-top: 20px;
+      margin-top: 25px;
       font-size: 22px;
       font-weight: 700;
+      color: #ffd700;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
+
+  <!-- GANTI logo.png dengan nama file logo kamu -->
+  <img src="logo.png" class="logo" alt="Logo Bank">
+
   <h1>Bank Prima Nadi</h1>
 
-  <button class="teller" onclick="ambilTeller()">Ambil Antrian Teller</button>
-  <button class="cs" onclick="ambilCS()">Ambil Antrian CS</button>
+  <button class="gold" onclick="ambilTeller()">Ambil Antrian Teller</button>
+  <button class="gold" onclick="ambilCS()">Ambil Antrian CS</button>
 
   <div id="hasil"></div>
+
 </div>
 
 <script type="module">
@@ -104,5 +112,3 @@ window.ambilCS = async function() {
 
 </body>
 </html>
-
-
