@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bank Prima Nadi - Ambil Antrian</title>
+</head>
+<body>
+  <h2>Ambil Nomor Antrian</h2>
+
+  <button onclick="ambilTeller()">Ambil Antrian Teller</button>
+  <button onclick="ambilCS()">Ambil Antrian CS</button>
+
+  <h3 id="hasil"></h3>
+
+<script type="module">
+import { db } from './firebase-config.js';
+import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+window.ambilTeller = async function() {
+  const tellerRef = ref(db, 'antrian/teller');
+
+  const snapshot = await get(tellerRef);
+  let nomor = 1;
+
+  if (snapshot.exists()) {
+    nomor = snapshot.val() + 1;
+  }
+
+  await set(tellerRef, nomor);
+  document.getElementById("hasil").innerText = "Nomor Teller: " + nomor;
+};
+
+window.ambilCS = async function() {
+  const csRef = ref(db, 'antrian/cs');
+
+  const snapshot = await get(csRef);
+  let nomor = 1;
+
+  if (snapshot.exists()) {
+    nomor = snapshot.val() + 1;
+  }
+
+  await set(csRef, nomor);
+  document.getElementById("hasil").innerText = "Nomor CS: " + nomor;
+};
+</script>
+
+</body>
+</html>
