@@ -20,6 +20,7 @@ body{
     justify-content:space-between;
 }
 
+/* ===== HEADER ===== */
 header{
     display:flex;
     justify-content:space-between;
@@ -28,7 +29,7 @@ header{
 }
 
 .logo{
-    width:100px;
+    width:110px;
 }
 
 .bank-name{
@@ -42,6 +43,7 @@ header{
     font-weight:600;
 }
 
+/* ===== MAIN ===== */
 .main{
     flex:1;
     display:flex;
@@ -51,20 +53,21 @@ header{
 
 .box{
     display:flex;
-    gap:120px;
+    gap:140px;
 }
 
 .card{
-    width:380px;
-    height:380px;
+    width:420px;
+    height:420px;
     background:rgba(255,255,255,0.08);
     border-radius:30px;
     display:flex;
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    box-shadow:0 30px 70px rgba(0,0,0,0.4);
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
     border:1px solid rgba(255,255,255,0.2);
+    backdrop-filter:blur(6px);
 }
 
 .label{
@@ -73,17 +76,20 @@ header{
 }
 
 .number{
-    font-size:120px;
+    font-size:140px;
     font-weight:900;
     color:#ffd700;
-    text-shadow:0 0 20px rgba(255,215,0,0.8);
-    transition:0.3s ease;
+    text-shadow:0 0 25px rgba(255,215,0,0.9);
+    transition:transform 0.25s ease;
+    width:100%;
+    text-align:center;
 }
 
 .animate{
-    transform:scale(1.15);
+    transform:scale(1.12);
 }
 
+/* ===== FOOTER ===== */
 footer{
     background:rgba(0,0,0,0.3);
     padding:15px 0;
@@ -95,7 +101,7 @@ footer{
 .marquee{
     display:inline-block;
     padding-left:100%;
-    animation:marquee 18s linear infinite;
+    animation:marquee 20s linear infinite;
 }
 
 @keyframes marquee{
@@ -138,6 +144,7 @@ import { db } from './firebase-config.js';
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 function speak(text){
+    speechSynthesis.cancel(); // cegah suara dobel
     const suara = new SpeechSynthesisUtterance(text);
     suara.lang = "id-ID";
     suara.rate = 0.9;
@@ -152,8 +159,8 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-let lastTeller = 0;
-let lastCS = 0;
+let lastTeller = null;
+let lastCS = null;
 
 const tellerRef = ref(db,'antrian/teller');
 const csRef = ref(db,'antrian/cs');
@@ -165,8 +172,10 @@ onValue(tellerRef,(snapshot)=>{
 
         if(nomor !== lastTeller){
             document.getElementById("teller").classList.add("animate");
-            setTimeout(()=>document.getElementById("teller").classList.remove("animate"),300);
-            speak("Nomor Teller " + nomor + ", silakan ke loket.");
+            setTimeout(()=>document.getElementById("teller").classList.remove("animate"),250);
+            if(lastTeller !== null){
+                speak("Nomor Teller " + nomor + ", silakan ke loket.");
+            }
             lastTeller = nomor;
         }
     }
@@ -179,8 +188,10 @@ onValue(csRef,(snapshot)=>{
 
         if(nomor !== lastCS){
             document.getElementById("cs").classList.add("animate");
-            setTimeout(()=>document.getElementById("cs").classList.remove("animate"),300);
-            speak("Nomor Customer Service " + nomor + ", silakan ke loket.");
+            setTimeout(()=>document.getElementById("cs").classList.remove("animate"),250);
+            if(lastCS !== null){
+                speak("Nomor Customer Service " + nomor + ", silakan ke loket.");
+            }
             lastCS = nomor;
         }
     }
@@ -189,4 +200,6 @@ onValue(csRef,(snapshot)=>{
 
 </body>
 </html>
+
+
 
