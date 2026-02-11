@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Display Antrian - Bank Prima Nadi</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#0a1f44,#0f3c88,#1b5fc1);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    text-align:center;
+}
+
+.logo{
+    width:120px;
+    margin-bottom:20px;
+}
+
+h1{
+    font-size:40px;
+    margin-bottom:40px;
+}
+
+.box{
+    display:flex;
+    gap:80px;
+    justify-content:center;
+}
+
+.card{
+    background:rgba(255,255,255,0.1);
+    padding:40px 80px;
+    border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.4);
+}
+
+.label{
+    font-size:28px;
+    margin-bottom:20px;
+}
+
+.number{
+    font-size:90px;
+    font-weight:900;
+    color:#ffd700;
+    transition:0.3s;
+}
+
+.animate{
+    transform:scale(1.2);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img src="logo.png" class="logo">
+
+<h1>Bank Prima Nadi</h1>
+
+<div class="box">
+    <div class="card">
+        <div class="label">TELLER</div>
+        <div id="teller" class="number">0</div>
+    </div>
+
+    <div class="card">
+        <div class="label">CUSTOMER SERVICE</div>
+        <div id="cs" class="number">0</div>
+    </div>
+</div>
+
+</div>
+
+<script type="module">
+import { db } from './firebase-config.js';
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+function speak(text){
+    const suara = new SpeechSynthesisUtterance(text);
+    suara.lang = "id-ID";
+    suara.rate = 0.9;
+    speechSynthesis.speak(suara);
+}
+
+const tellerRef = ref(db,'antrian/teller');
+const csRef = ref(db,'antrian/cs');
+
+let lastTeller = 0;
+let lastCS = 0;
+
+onValue(tellerRef,(snapshot)=>{
+    if(snapshot.exists()){
+        let nomor = snapshot.val();
+        document.getElementById("teller").innerText = nomor;
+
+        if(nomor !== lastTeller){
+            document.getElementById("teller").classList.add("animate");
+            setTimeout(()=>document.getElementById("teller").classList.remove("animate"),300);
+            speak("Nomor Teller " + nomor + ", silakan ke loket.");
+            lastTeller = nomor;
+        }
+    }
+});
+
+onValue(csRef,(snapshot)=>{
+    if(snapshot.exists()){
+        let nomor = snapshot.val();
+        document.getElementById("cs").innerText = nomor;
+
+        if(nomor !== lastCS){
+            document.getElementById("cs").classList.add("animate");
+            setTimeout(()=>document.getElementById("cs").classList.remove("animate"),300);
+            speak("Nomor Customer Service " + nomor + ", silakan ke loket.");
+            lastCS = nomor;
+        }
+    }
+});
+</script>
+
+</body>
+</html>
