@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login Loket - Bank Prima Nadi</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+}
+
+.login-box{
+  background:#fff;
+  padding:40px;
+  border-radius:15px;
+  width:350px;
+  text-align:center;
+  box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+
+.logo{
+  width:80px;
+  margin-bottom:10px;
+}
+
+h1{color:#1e3c72;margin:10px 0;}
+.subtitle{font-size:14px;color:#777;margin-bottom:25px;}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:8px;
+  background:#2a5298;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+button:hover{background:#1e3c72;}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+  <img src="logo.png" class="logo">
+  <h1>Bank Prima Nadi</h1>
+  <div class="subtitle">Sistem Antrian Digital</div>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+
+// 🔥 GANTI DENGAN CONFIG MILIK BOSQUE
+const firebaseConfig = {
+  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "antrian-bank-prima-nadi",
+  storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+  messagingSenderId: "807742809953",
+  appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.login = function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  signInWithEmailAndPassword(auth,email,password)
+  .then(()=>{
+      alert("Login Berhasil!");
+      window.location.href="dashboard.html";
+  })
+  .catch((error)=>{
+      alert("Login Gagal: "+error.message);
+  });
+}
+
+</script>
+
+</body>
+</html>

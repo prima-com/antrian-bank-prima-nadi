@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ambil Antrian - Bank Prima Nadi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      color: #1e3c72;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      width: 400px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      background: #2a5298;
+      color: white;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #1e3c72;
+      transform: scale(1.03);
+    }
+
+    .nomor {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>Bank Prima Nadi</h1>
+    <p>Pilih Jenis Layanan</p>
+
+    <button onclick="ambilNomor('teller')">Ambil Teller</button>
+    <button onclick="ambilNomor('cs')">Ambil CS</button>
+
+    <div class="nomor" id="hasilNomor"></div>
+  </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "antrian-bank-prima-nadi",
+  storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+  messagingSenderId: "807742809953",
+  appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.ambilNomor = async function(jenis) {
+  try {
+
+    const antrianRef = ref(db, "antrian/" + jenis);
+    const snapshot = await get(antrianRef);
+    const data = snapshot.val();
+
+    let nomorSekarang = data.current;
+    let nomorBaru = nomorSekarang + 1;
+
+    await update(antrianRef, {
+      current: nomorBaru
+    });
+
+    document.getElementById("hasilNomor").innerHTML =
+      "Nomor Antrian Anda: <br><br>" + jenis.toUpperCase() + " - " + nomorBaru;
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+}
+
+</script>
+
+</body>
+</html>
