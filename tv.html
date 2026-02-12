@@ -2,38 +2,35 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Display Antrian</title>
+<title>Display Antrian Bank</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial, Helvetica, sans-serif;
-  background:#0c3f6b;
+  background:#0b2d57;
   color:white;
 }
 
 /* HEADER */
 .header{
+  height:70px;
+  background:#123d74;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  background:#08365c;
-  padding:12px 25px;
-  font-size:28px;
+  justify-content:space-between;
+  padding:0 30px;
   font-weight:bold;
+  font-size:28px;
 }
 
-.clock{
-  text-align:right;
-  font-size:22px;
-}
-
-/* MAIN LAYOUT */
+/* AREA UTAMA */
 .container{
   display:flex;
   height:65vh;
   padding:15px;
   gap:15px;
+  box-sizing:border-box;
 }
 
 /* PANEL KIRI */
@@ -42,36 +39,36 @@ body{
   display:flex;
   flex-direction:column;
   gap:12px;
+  height:100%;
 }
 
 .box{
-  background:#0e5c8a;
-  border-radius:10px;
-  padding:20px;
-  text-align:center;
+  flex:1;
+  background:#1e5e87;
+  border-radius:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
-.loket{
-  font-size:40px;
+.title{
+  font-size:26px;
   font-weight:bold;
-}
-
-.nomor-label{
-  font-size:22px;
   margin-bottom:10px;
 }
 
 .nomor{
-  font-size:90px;
+  font-size:7vw;
+  color:gold;
   font-weight:bold;
-  color:#ffd700;
 }
 
-/* TV AREA */
+/* AREA TV */
 .tv{
   flex:1;
   background:black;
-  border-radius:10px;
+  border-radius:15px;
   overflow:hidden;
 }
 
@@ -84,36 +81,49 @@ body{
 /* MINI LOKET */
 .mini{
   display:flex;
-  gap:10px;
-  padding:0 15px 10px;
+  gap:12px;
+  padding:10px 15px;
 }
 
-.mini-box{
+.loket{
   flex:1;
-  background:#0e5c8a;
+  background:#163d6b;
+  border-radius:12px;
+  padding:12px;
   text-align:center;
-  padding:10px;
-  border-radius:8px;
 }
 
-.mini-box h3{
+.loket h3{
   margin:0;
   font-size:18px;
 }
 
-.mini-num{
+.loket span{
   font-size:28px;
-  color:#ffd700;
+  color:gold;
   font-weight:bold;
 }
 
 /* RUNNING TEXT */
 .running{
-  background:#072a48;
-  padding:12px;
-  font-size:26px;
+  background:#0a2445;
   color:yellow;
+  font-size:24px;
+  padding:10px;
   font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+.running div{
+  display:inline-block;
+  padding-left:100%;
+  animation:jalan 20s linear infinite;
+}
+
+@keyframes jalan{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-100%);}
 }
 </style>
 </head>
@@ -121,8 +131,8 @@ body{
 <body>
 
 <div class="header">
-  BANK ANDA
-  <div class="clock" id="clock"></div>
+  <div>BANK PRIMA NADI</div>
+  <div id="jam"></div>
 </div>
 
 <div class="container">
@@ -131,53 +141,68 @@ body{
   <div class="left">
 
     <div class="box">
-      <div class="loket">LOKET A</div>
+      <div class="title">LOKET A</div>
     </div>
 
     <div class="box">
-      <div class="nomor-label">NOMOR ANTRIAN</div>
+      <div class="title">NOMOR ANTRIAN</div>
       <div class="nomor">A 015</div>
     </div>
 
     <div class="box">
-      <div class="loket">LOKET B</div>
+      <div class="title">LOKET B</div>
     </div>
 
     <div class="box">
-      <div class="nomor-label">NOMOR ANTRIAN</div>
-      <div class="nomor">B 010</div>
+      <div class="title">NOMOR ANTRIAN</div>
+      <div class="nomor">B 006</div>
     </div>
 
   </div>
 
-  <!-- AREA TV -->
+  <!-- TV -->
   <div class="tv">
-    <iframe src="https://www.youtube.com/embed/live_stream?channel=UCupvZG-5ko_eiXAupbDfxWw&autoplay=1&mute=1"></iframe>
+    <iframe src="https://www.youtube.com/embed/21X5lGlDOfg?autoplay=1&mute=1"></iframe>
   </div>
 
 </div>
 
 <!-- MINI LOKET -->
 <div class="mini">
-  <div class="mini-box"><h3>LOKET 1</h3><div class="mini-num">A 015</div></div>
-  <div class="mini-box"><h3>LOKET 2</h3><div class="mini-num">A 011</div></div>
-  <div class="mini-box"><h3>LOKET 3</h3><div class="mini-num">A 012</div></div>
-  <div class="mini-box"><h3>LOKET 4</h3><div class="mini-num">B 013</div></div>
+  <div class="loket">
+    <h3>LOKET 1</h3>
+    <span>A 015</span>
+  </div>
+  <div class="loket">
+    <h3>LOKET 2</h3>
+    <span>A 011</span>
+  </div>
+  <div class="loket">
+    <h3>LOKET 3</h3>
+    <span>A 012</span>
+  </div>
+  <div class="loket">
+    <h3>LOKET 4</h3>
+    <span>B 013</span>
+  </div>
 </div>
 
 <!-- RUNNING TEXT -->
 <div class="running">
-  <marquee>Selamat datang di Bank Anda • Harap menunggu nomor antrian dipanggil • Terima kasih atas kunjungan Anda</marquee>
+  <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
 </div>
 
 <script>
-function updateClock(){
+function updateJam(){
   const now = new Date();
-  document.getElementById("clock").innerHTML =
-    now.toLocaleTimeString() + "<br>" + now.toLocaleDateString();
+  const jam = now.toLocaleTimeString('id-ID');
+  const tgl = now.toLocaleDateString('id-ID');
+  document.getElementById("jam").innerHTML = jam+"<br>"+tgl;
 }
-setInterval(updateClock,1000);
+setInterval(updateJam,1000);
+updateJam();
 </script>
 
 </body>
 </html>
+
