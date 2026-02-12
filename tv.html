@@ -11,68 +11,119 @@
 body{
     margin:0;
     font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#081c3a,#0f3c88,#1b5fc1);
+    background:linear-gradient(135deg,#0a2a5e,#0f4aa8,#1e6be0);
     color:white;
     height:100vh;
     display:flex;
     flex-direction:column;
 }
 
+/* HEADER */
 header{
     display:flex;
     justify-content:space-between;
-    padding:20px 60px;
+    align-items:center;
+    padding:15px 40px;
+    background:rgba(0,0,0,0.3);
 }
 
-.logo{width:110px;}
+.logo{ height:55px; }
 
-.bank-name{font-size:32px;font-weight:700;}
+.clock{
+    font-size:28px;
+    font-weight:700;
+}
 
-.clock{font-size:26px;}
-
+/* MAIN AREA */
 .main{
     flex:1;
     display:flex;
-    justify-content:center;
-    align-items:center;
+    padding:15px;
+    gap:15px;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2, 380px);
-    gap:70px 120px;
-}
-
-.card{
-    width:380px;
-    height:260px;
-    background:rgba(255,255,255,0.08);
-    border-radius:26px;
+/* LEFT PANEL */
+.left{
+    flex:1;
     display:flex;
     flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    box-shadow:0 25px 70px rgba(0,0,0,0.5);
+    gap:15px;
 }
 
-.label{
-    font-size:24px;
-    margin-bottom:15px;
-    letter-spacing:1px;
+.panel{
+    background:rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+.panel h2{
+    margin:0;
+    font-size:32px;
 }
 
 .number{
     font-size:110px;
     font-weight:900;
     color:#ffd700;
-    text-shadow:0 0 22px rgba(255,215,0,0.9);
+    text-shadow:0 0 25px rgba(255,215,0,0.8);
 }
 
+/* RIGHT TV */
+.tv{
+    width:50%;
+    background:black;
+    border-radius:20px;
+    overflow:hidden;
+}
 
-footer{
-    background:rgba(0,0,0,0.3);
-    padding:12px;
+.tv iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* MINI LOKET */
+.bottom{
+    display:flex;
+    background:rgba(0,0,0,0.4);
+}
+
+.loket{
+    flex:1;
     text-align:center;
+    padding:12px;
+    border-right:1px solid rgba(255,255,255,0.2);
+}
+
+.loket:last-child{ border-right:none; }
+
+.loket-title{
+    font-size:18px;
+}
+
+.loket-number{
+    font-size:34px;
+    font-weight:700;
+    color:#ffd700;
+}
+
+/* RUNNING TEXT */
+footer{
+    background:#001b44;
+    padding:10px;
+    overflow:hidden;
+}
+
+.marquee{
+    white-space:nowrap;
+    animation:scroll 18s linear infinite;
+}
+
+@keyframes scroll{
+    0%{ transform:translateX(100%); }
+    100%{ transform:translateX(-100%); }
 }
 </style>
 </head>
@@ -80,80 +131,108 @@ footer{
 <body>
 
 <header>
-<img src="logo.png" class="logo">
-<div class="bank-name">BANK PRIMA NADI</div>
-<div id="clock" class="clock"></div>
+    <img src="logo.png" class="logo">
+    <div class="clock" id="clock"></div>
 </header>
 
 <div class="main">
-<div class="grid">
 
-<div class="card">
-<div class="label">TELLER 1</div>
-<div id="t1" class="number">0</div>
+    <!-- LEFT SIDE -->
+    <div class="left">
+
+        <div class="panel">
+            <h2>TELLER</h2>
+            <div id="teller" class="number">0</div>
+        </div>
+
+        <div class="panel">
+            <h2>CUSTOMER SERVICE</h2>
+            <div id="cs" class="number">0</div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT SIDE TV -->
+    <div class="tv">
+        <!-- TV ONLINE -->
+        <iframe src="https://www.youtube.com/embed/live_stream?channel=UCupvZG-5ko_eiXAupbDfxWw"></iframe>
+    </div>
+
 </div>
 
-<div class="card">
-<div class="label">TELLER 2</div>
-<div id="t2" class="number">0</div>
-</div>
-
-<div class="card">
-<div class="label">CS 1</div>
-<div id="c1" class="number">0</div>
-</div>
-
-<div class="card">
-<div class="label">CS 2</div>
-<div id="c2" class="number">0</div>
-</div>
-
-</div>
+<!-- MINI LOKET -->
+<div class="bottom">
+    <div class="loket">
+        <div class="loket-title">LOKET 1</div>
+        <div id="lok1" class="loket-number">0</div>
+    </div>
+    <div class="loket">
+        <div class="loket-title">LOKET 2</div>
+        <div id="lok2" class="loket-number">0</div>
+    </div>
+    <div class="loket">
+        <div class="loket-title">LOKET 3</div>
+        <div id="lok3" class="loket-number">0</div>
+    </div>
+    <div class="loket">
+        <div class="loket-title">LOKET 4</div>
+        <div id="lok4" class="loket-number">0</div>
+    </div>
 </div>
 
 <footer>
-Selamat Datang di Bank Prima Nadi • Mohon menunggu nomor dipanggil
+    <div class="marquee">
+        Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih atas kepercayaan Anda
+    </div>
 </footer>
 
 <script type="module">
 import { db } from './firebase-config.js';
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-function speak(text){
-    speechSynthesis.cancel();
-    const s = new SpeechSynthesisUtterance(text);
-    s.lang="id-ID";
-    speechSynthesis.speak(s);
-}
-
-function clock(){
+/* JAM */
+function updateClock(){
     document.getElementById("clock").innerText =
-    new Date().toLocaleTimeString('id-ID');
+        new Date().toLocaleTimeString("id-ID");
 }
-setInterval(clock,1000);
+setInterval(updateClock,1000);
 
-function listen(path,id,label){
-    let last=null;
-    onValue(ref(db,path),(snap)=>{
-        if(!snap.exists()) return;
-        let num=snap.val();
-        document.getElementById(id).innerText=num;
-
-        if(last!==null && num!==last){
-            speak("Nomor " + num + " silakan ke " + label);
-        }
-        last=num;
-    });
+/* SUARA */
+function speak(text){
+    const suara = new SpeechSynthesisUtterance(text);
+    suara.lang="id-ID";
+    suara.rate=0.9;
+    speechSynthesis.speak(suara);
 }
 
-listen("antrian/teller1","t1","Teller satu");
-listen("antrian/teller2","t2","Teller dua");
-listen("antrian/cs1","c1","Customer Service satu");
-listen("antrian/cs2","c2","Customer Service dua");
+/* REALTIME DATA */
+let lastTeller=0;
+let lastCS=0;
+
+onValue(ref(db,'antrian/teller'),snap=>{
+    let n=snap.val();
+    document.getElementById("teller").innerText=n;
+    document.getElementById("lok1").innerText=n;
+    if(n!==lastTeller){
+        speak("Nomor Teller "+n+" silakan ke loket");
+        lastTeller=n;
+    }
+});
+
+onValue(ref(db,'antrian/cs'),snap=>{
+    let n=snap.val();
+    document.getElementById("cs").innerText=n;
+    document.getElementById("lok2").innerText=n;
+    if(n!==lastCS){
+        speak("Nomor Customer Service "+n+" silakan ke loket");
+        lastCS=n;
+    }
+});
 </script>
 
 </body>
 </html>
+
 
 
 
