@@ -15,19 +15,19 @@ body{
 /* HEADER */
 .header{
   height:70px;
-  background:#123d74;
+  background:#1d4c84;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 30px;
+  font-size:32px;
   font-weight:bold;
-  font-size:28px;
 }
 
-/* AREA UTAMA */
+/* LAYOUT UTAMA */
 .container{
   display:flex;
-  height:65vh;
+  height:62vh;
   padding:15px;
   gap:15px;
   box-sizing:border-box;
@@ -36,15 +36,15 @@ body{
 /* PANEL KIRI */
 .left{
   width:32%;
+  height:100%;
   display:flex;
   flex-direction:column;
   gap:12px;
-  height:100%;
 }
 
+/* BOX */
 .box{
-  flex:1;
-  background:#1e5e87;
+  background:#2a638a;
   border-radius:15px;
   display:flex;
   flex-direction:column;
@@ -52,24 +52,33 @@ body{
   align-items:center;
 }
 
+.small{
+  height:10%;
+}
+
+.big{
+  height:40%;
+}
+
+/* FONT PROPORSIONAL */
 .title{
-  font-size:26px;
+  font-size:2.2vh;
   font-weight:bold;
-  margin-bottom:10px;
+  letter-spacing:1px;
 }
 
 .nomor{
-  font-size:7vw;
-  color:gold;
+  font-size:9vh;
   font-weight:bold;
+  color:gold;
 }
 
-/* AREA TV */
+/* TV */
 .tv{
   flex:1;
-  background:black;
   border-radius:15px;
   overflow:hidden;
+  background:black;
 }
 
 .tv iframe{
@@ -89,17 +98,17 @@ body{
   flex:1;
   background:#163d6b;
   border-radius:12px;
-  padding:12px;
+  padding:10px;
   text-align:center;
 }
 
 .loket h3{
   margin:0;
-  font-size:18px;
+  font-size:2vh;
 }
 
 .loket span{
-  font-size:28px;
+  font-size:3vh;
   color:gold;
   font-weight:bold;
 }
@@ -108,7 +117,7 @@ body{
 .running{
   background:#0a2445;
   color:yellow;
-  font-size:24px;
+  font-size:2.5vh;
   padding:10px;
   font-weight:bold;
   white-space:nowrap;
@@ -140,20 +149,20 @@ body{
   <!-- PANEL KIRI -->
   <div class="left">
 
-    <div class="box">
+    <div class="box small">
       <div class="title">LOKET A</div>
     </div>
 
-    <div class="box">
+    <div class="box big">
       <div class="title">NOMOR ANTRIAN</div>
       <div class="nomor">A 015</div>
     </div>
 
-    <div class="box">
+    <div class="box small">
       <div class="title">LOKET B</div>
     </div>
 
-    <div class="box">
+    <div class="box big">
       <div class="title">NOMOR ANTRIAN</div>
       <div class="nomor">B 006</div>
     </div>
@@ -162,32 +171,19 @@ body{
 
   <!-- TV -->
   <div class="tv">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/yNKvkPJl-tg?si=y-e2Pn42ARuENsAr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe src="https://www.youtube.com/embed/21X5lGlDOfg?autoplay=1&mute=1"></iframe>
   </div>
 
 </div>
 
 <!-- MINI LOKET -->
 <div class="mini">
-  <div class="loket">
-    <h3>LOKET 1</h3>
-    <span>A 015</span>
-  </div>
-  <div class="loket">
-    <h3>LOKET 2</h3>
-    <span>A 011</span>
-  </div>
-  <div class="loket">
-    <h3>LOKET 3</h3>
-    <span>A 012</span>
-  </div>
-  <div class="loket">
-    <h3>LOKET 4</h3>
-    <span>B 013</span>
-  </div>
+  <div class="loket"><h3>LOKET 1</h3><span>A 015</span></div>
+  <div class="loket"><h3>LOKET 2</h3><span>A 011</span></div>
+  <div class="loket"><h3>LOKET 3</h3><span>A 012</span></div>
+  <div class="loket"><h3>LOKET 4</h3><span>B 013</span></div>
 </div>
 
-<!-- RUNNING TEXT -->
 <div class="running">
   <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
 </div>
@@ -195,9 +191,8 @@ body{
 <script>
 function updateJam(){
   const now = new Date();
-  const jam = now.toLocaleTimeString('id-ID');
-  const tgl = now.toLocaleDateString('id-ID');
-  document.getElementById("jam").innerHTML = jam+"<br>"+tgl;
+  document.getElementById("jam").innerHTML =
+    now.toLocaleTimeString("id-ID")+"<br>"+now.toLocaleDateString("id-ID");
 }
 setInterval(updateJam,1000);
 updateJam();
@@ -205,6 +200,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
