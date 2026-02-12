@@ -2,211 +2,182 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Display Antrian - Bank Prima Nadi</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+<title>Display Antrian</title>
 
 <style>
 body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:#0a2d5e;
-    color:white;
-    height:100vh;
-    display:grid;
-    grid-template-rows:70px 1fr 120px;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#0c3f6b;
+  color:white;
 }
 
 /* HEADER */
-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 40px;
-    background:#0f3c88;
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#08365c;
+  padding:12px 25px;
+  font-size:28px;
+  font-weight:bold;
 }
 
-.logo{width:70px;}
-
-.bank-name{
-    font-size:28px;
-    font-weight:700;
+.clock{
+  text-align:right;
+  font-size:22px;
 }
 
-.clock{font-size:24px;}
-
-/* MAIN GRID */
-.main{
-    padding:20px;
-    display:grid;
-    grid-template-rows:55% 45%;
-    gap:20px;
+/* MAIN LAYOUT */
+.container{
+  display:flex;
+  height:65vh;
+  padding:15px;
+  gap:15px;
 }
 
-/* TOP AREA */
-.top{
-    display:grid;
-    grid-template-columns:1fr 1fr 2fr;
-    gap:20px;
+/* PANEL KIRI */
+.left{
+  width:32%;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-/* PANEL UTAMA */
-.panel{
-    background:#1c4c94;
-    border-radius:18px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-}
-
-.panel h2{
-    font-size:26px;
-    margin-bottom:10px;
-}
-
-.number{
-    font-size:90px;
-    font-weight:900;
-    color:#ffd700;
-}
-
-/* VIDEO */
-.video{
-    border-radius:18px;
-    overflow:hidden;
-}
-
-.video iframe{
-    width:100%;
-    height:100%;
-}
-
-/* MINI LOKET */
-.bottom{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:20px;
+.box{
+  background:#0e5c8a;
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
 }
 
 .loket{
-    background:#153c74;
-    border-radius:16px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+  font-size:40px;
+  font-weight:bold;
 }
 
-.loket h3{font-size:18px;margin-bottom:5px;}
+.nomor-label{
+  font-size:22px;
+  margin-bottom:10px;
+}
 
-.loket span{
-    font-size:42px;
-    font-weight:800;
-    color:#ffd700;
+.nomor{
+  font-size:90px;
+  font-weight:bold;
+  color:#ffd700;
+}
+
+/* TV AREA */
+.tv{
+  flex:1;
+  background:black;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.tv iframe{
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+/* MINI LOKET */
+.mini{
+  display:flex;
+  gap:10px;
+  padding:0 15px 10px;
+}
+
+.mini-box{
+  flex:1;
+  background:#0e5c8a;
+  text-align:center;
+  padding:10px;
+  border-radius:8px;
+}
+
+.mini-box h3{
+  margin:0;
+  font-size:18px;
+}
+
+.mini-num{
+  font-size:28px;
+  color:#ffd700;
+  font-weight:bold;
 }
 
 /* RUNNING TEXT */
-footer{
-    background:#092148;
-    display:flex;
-    align-items:center;
-    overflow:hidden;
-}
-
-.marquee{
-    white-space:nowrap;
-    font-size:22px;
-    padding-left:100%;
-    animation:marquee 18s linear infinite;
-}
-
-@keyframes marquee{
-    from{transform:translateX(0)}
-    to{transform:translateX(-100%)}
+.running{
+  background:#072a48;
+  padding:12px;
+  font-size:26px;
+  color:yellow;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <img src="logo.png" class="logo">
-    <div class="bank-name">BANK PRIMA NADI</div>
-    <div id="clock" class="clock"></div>
-</header>
+<div class="header">
+  BANK ANDA
+  <div class="clock" id="clock"></div>
+</div>
 
-<div class="main">
+<div class="container">
 
-    <div class="top">
+  <!-- PANEL KIRI -->
+  <div class="left">
 
-        <div class="panel">
-            <h2>TELLER</h2>
-            <div id="teller" class="number">0</div>
-        </div>
-
-        <div class="panel">
-            <h2>CUSTOMER SERVICE</h2>
-            <div id="cs" class="number">0</div>
-        </div>
-
-        <div class="video">
-            <iframe src="https://www.youtube.com/embed/live_stream?channel=UCupvZG-5ko_eiXAupbDfxWw&autoplay=1&mute=1"></iframe>
-        </div>
-
+    <div class="box">
+      <div class="loket">LOKET A</div>
     </div>
 
-    <div class="bottom">
-        <div class="loket"><h3>LOKET 1</h3><span id="lok1">-</span></div>
-        <div class="loket"><h3>LOKET 2</h3><span id="lok2">-</span></div>
-        <div class="loket"><h3>LOKET 3</h3><span id="lok3">-</span></div>
-        <div class="loket"><h3>LOKET 4</h3><span id="lok4">-</span></div>
+    <div class="box">
+      <div class="nomor-label">NOMOR ANTRIAN</div>
+      <div class="nomor">A 015</div>
     </div>
+
+    <div class="box">
+      <div class="loket">LOKET B</div>
+    </div>
+
+    <div class="box">
+      <div class="nomor-label">NOMOR ANTRIAN</div>
+      <div class="nomor">B 010</div>
+    </div>
+
+  </div>
+
+  <!-- AREA TV -->
+  <div class="tv">
+    <iframe src="https://www.youtube.com/embed/live_stream?channel=UCupvZG-5ko_eiXAupbDfxWw&autoplay=1&mute=1"></iframe>
+  </div>
 
 </div>
 
-<footer>
-    <div class="marquee">
-        Selamat Datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih atas kepercayaan Anda
-    </div>
-</footer>
+<!-- MINI LOKET -->
+<div class="mini">
+  <div class="mini-box"><h3>LOKET 1</h3><div class="mini-num">A 015</div></div>
+  <div class="mini-box"><h3>LOKET 2</h3><div class="mini-num">A 011</div></div>
+  <div class="mini-box"><h3>LOKET 3</h3><div class="mini-num">A 012</div></div>
+  <div class="mini-box"><h3>LOKET 4</h3><div class="mini-num">B 013</div></div>
+</div>
 
-<script type="module">
-import { db } from './firebase-config.js';
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<!-- RUNNING TEXT -->
+<div class="running">
+  <marquee>Selamat datang di Bank Anda • Harap menunggu nomor antrian dipanggil • Terima kasih atas kunjungan Anda</marquee>
+</div>
 
-/* JAM */
-setInterval(()=>{
-document.getElementById("clock").innerText =
-new Date().toLocaleTimeString('id-ID');
-},1000);
-
-/* SUARA */
-function speak(text){
-let s=new SpeechSynthesisUtterance(text);
-s.lang="id-ID";
-speechSynthesis.speak(s);
+<script>
+function updateClock(){
+  const now = new Date();
+  document.getElementById("clock").innerHTML =
+    now.toLocaleTimeString() + "<br>" + now.toLocaleDateString();
 }
-
-let lastTeller=0,lastCS=0;
-
-onValue(ref(db,'antrian/teller'),snap=>{
-let n=snap.val();
-document.getElementById("teller").innerText=n;
-document.getElementById("lok1").innerText="A "+n;
-if(n!=lastTeller){speak("Nomor teller "+n);lastTeller=n;}
-});
-
-onValue(ref(db,'antrian/cs'),snap=>{
-let n=snap.val();
-document.getElementById("cs").innerText=n;
-document.getElementById("lok2").innerText="B "+n;
-if(n!=lastCS){speak("Nomor CS "+n);lastCS=n;}
-});
+setInterval(updateClock,1000);
 </script>
 
 </body>
 </html>
-
-
