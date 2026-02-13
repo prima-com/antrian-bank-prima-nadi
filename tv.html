@@ -20,12 +20,8 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:0 30px;
-}
-
-/* JAM LED */
-#jam{
-  font-family:'Courier New', monospace;
-  text-align:right;
+  font-size:32px;
+  font-weight:bold;
 }
 
 .led{
@@ -36,8 +32,7 @@ body{
   text-shadow:
       0 0 5px #FFD700,
       0 0 10px #FFD700,
-      0 0 20px rgba(255,215,0,0.8),
-      0 0 40px rgba(255,215,0,0.6);
+      0 0 20px rgba(255,215,0,0.8);
 }
 
 /* LAYOUT UTAMA */
@@ -51,14 +46,12 @@ body{
 
 /* PANEL KIRI */
 .left{
-  width:32%;
-  height:100%;
+  width:28%;
   display:flex;
   flex-direction:column;
   gap:12px;
 }
 
-/* BOX */
 .box{
   background:#2a638a;
   border-radius:15px;
@@ -68,30 +61,23 @@ body{
   align-items:center;
 }
 
-.small{
-  height:10%;
-}
+.small{ height:12%; }
+.big{ height:38%; }
 
-.big{
-  height:40%;
-}
-
-/* FONT */
 .title{
   font-size:2.2vh;
   font-weight:bold;
-  letter-spacing:1px;
 }
 
 .nomor{
-  font-size:9vh;
+  font-size:8vh;
   font-weight:bold;
   color:gold;
 }
 
 /* TV */
 .tv{
-  flex:1;
+  width:45%;
   border-radius:15px;
   overflow:hidden;
   background:black;
@@ -103,12 +89,37 @@ body{
   border:none;
 }
 
+/* PANEL PROMO */
+.promo{
+  width:27%;
+  background:#163d6b;
+  border-radius:15px;
+  padding:15px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.promo h2{
+  margin:0;
+  text-align:center;
+  font-size:2.5vh;
+}
+
+.promo-card{
+  background:#2a638a;
+  border-radius:12px;
+  padding:15px;
+  font-size:2vh;
+}
+
 /* MINI LOKET */
 .mini{
   display:flex;
   gap:12px;
   padding:20px 15px 10px 15px;
-  margin-top:30px;
+  margin-top:25px;
 }
 
 .loket{
@@ -156,13 +167,16 @@ body{
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <img src="logo_pn.png" height="55">
-  <div id="jam"></div>
+  <img src="logo_pn.png" height="100%">
+  <div id="jam" class="led"></div>
 </div>
 
+<!-- LAYOUT -->
 <div class="container">
 
+  <!-- PANEL ANTRIAN -->
   <div class="left">
 
     <div class="box small">
@@ -185,12 +199,36 @@ body{
 
   </div>
 
+  <!-- TV -->
   <div class="tv">
     <iframe src="https://www.youtube.com/embed/yNKvkPJl-tg?autoplay=1&mute=1"></iframe>
   </div>
 
+  <!-- PANEL PROMO -->
+  <div class="promo">
+
+    <h2>PROMO BANK</h2>
+
+    <div class="promo-card">
+      🎁 Tabungan Prima Senyum<br>
+      Hadiah Motor PCX 160
+    </div>
+
+    <div class="promo-card">
+      💳 Kredit UMKM Cepat Cair<br>
+      Proses Cepat & Mudah
+    </div>
+
+    <div class="promo-card">
+      📱 Mobile Banking Prima<br>
+      Transaksi Lebih Praktis
+    </div>
+
+  </div>
+
 </div>
 
+<!-- MINI LOKET -->
 <div class="mini">
   <div class="loket"><h3>LOKET 1</h3><span>A 015</span></div>
   <div class="loket"><h3>LOKET 2</h3><span>A 011</span></div>
@@ -198,41 +236,29 @@ body{
   <div class="loket"><h3>LOKET 4</h3><span>B 013</span></div>
 </div>
 
+<!-- RUNNING TEXT -->
 <div class="running">
   <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
 </div>
 
 <script>
-
 function updateJam(){
-
-  const hariNama = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-  const bulanNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-  let now = new Date();
-
-  let hari = hariNama[now.getDay()];
-  let tanggal = String(now.getDate()).padStart(2,'0');
-  let bulan = bulanNama[now.getMonth()];
-  let tahun = now.getFullYear();
-
-  let jam = String(now.getHours()).padStart(2,'0');
-  let menit = String(now.getMinutes()).padStart(2,'0');
-  let detik = String(now.getSeconds()).padStart(2,'0');
+  const now = new Date();
+  const hari = now.toLocaleDateString("id-ID",{weekday:"long"});
+  const tanggal = now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
+  const jam = now.toLocaleTimeString("id-ID");
 
   document.getElementById("jam").innerHTML =
-    `<div class="led">
-    ${hari}, ${tanggal} ${bulan} ${tahun} • pukul ${jam}:${menit}:${detik}
-    </div>`;
+    hari+", "+tanggal+"<br>Pukul "+jam;
 }
-
 setInterval(updateJam,1000);
 updateJam();
-
 </script>
 
 </body>
 </html>
+
+
 
 
 
