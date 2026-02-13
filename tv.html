@@ -20,8 +20,23 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:0 30px;
-  font-size:32px;
+}
+
+/* JAM LED */
+#jam{
+  font-family:'Courier New', monospace;
+  text-align:right;
+}
+
+.led{
+  font-size:22px;
   font-weight:bold;
+  letter-spacing:2px;
+  color:#00ffe1;
+  text-shadow:
+      0 0 5px #00ffe1,
+      0 0 10px #00ffe1,
+      0 0 20px #00ffe1;
 }
 
 /* LAYOUT UTAMA */
@@ -60,7 +75,7 @@ body{
   height:40%;
 }
 
-/* FONT PROPORSIONAL */
+/* FONT */
 .title{
   font-size:2.2vh;
   font-weight:bold;
@@ -91,10 +106,9 @@ body{
 .mini{
   display:flex;
   gap:12px;
-  padding:20px 15px 10px 15px; /* atas diperbesar */
-  margin-top:30px; /* ini yang bikin turun */
+  padding:20px 15px 10px 15px;
+  margin-top:30px;
 }
-
 
 .loket{
   flex:1;
@@ -142,13 +156,12 @@ body{
 <body>
 
 <div class="header">
-  <img src="logo_pn.png" height="100%" class="logo-bank"> 
+  <img src="logo_pn.png" height="55">
   <div id="jam"></div>
 </div>
 
 <div class="container">
 
-  <!-- PANEL KIRI -->
   <div class="left">
 
     <div class="box small">
@@ -171,13 +184,12 @@ body{
 
   </div>
 
-  <!-- TV -->
   <div class="tv">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/yNKvkPJl-tg?si=y-e2Pn42ARuENsAr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>  </div>
+    <iframe src="https://www.youtube.com/embed/yNKvkPJl-tg?autoplay=1&mute=1"></iframe>
+  </div>
 
 </div>
 
-<!-- MINI LOKET -->
 <div class="mini">
   <div class="loket"><h3>LOKET 1</h3><span>A 015</span></div>
   <div class="loket"><h3>LOKET 2</h3><span>A 011</span></div>
@@ -190,17 +202,38 @@ body{
 </div>
 
 <script>
+
 function updateJam(){
-  const now = new Date();
+
+  const hariNama = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+  const bulanNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+  let now = new Date();
+
+  let hari = hariNama[now.getDay()];
+  let tanggal = String(now.getDate()).padStart(2,'0');
+  let bulan = bulanNama[now.getMonth()];
+  let tahun = now.getFullYear();
+
+  let jam = String(now.getHours()).padStart(2,'0');
+  let menit = String(now.getMinutes()).padStart(2,'0');
+  let detik = String(now.getSeconds()).padStart(2,'0');
+
   document.getElementById("jam").innerHTML =
-    now.toLocaleTimeString("id-ID")+"<br>"+now.toLocaleDateString("id-ID");
+    `<div class="led">
+    ${hari}, ${tanggal} ${bulan} ${tahun} • pukul ${jam}:${menit}:${detik}
+    </div>`;
 }
+
 setInterval(updateJam,1000);
 updateJam();
+
 </script>
 
 </body>
 </html>
+
+
 
 
 
