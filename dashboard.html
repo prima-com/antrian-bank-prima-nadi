@@ -1,36 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Dashboard Antrian</title>
+<meta charset="UTF-8">
+<title>Dashboard Operator - Bank Prima Nadi</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins,Arial;
+  background:linear-gradient(135deg,#0b2d57,#1b5fc1);
+  color:white;
+}
+
+/* HEADER */
+.header{
+  background:#0a2445;
+  padding:20px;
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+/* GRID */
+.container{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:25px;
+  padding:30px;
+}
+
+/* CARD */
+.card{
+  background:#163d6b;
+  border-radius:20px;
+  padding:25px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+.title{
+  font-size:24px;
+  margin-bottom:10px;
+}
+
+.nomor{
+  font-size:70px;
+  color:gold;
+  font-weight:bold;
+  margin:20px 0;
+}
+
+/* BUTTON */
+.btn{
+  padding:15px 25px;
+  border:none;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  margin:5px;
+}
+
+.call{ background:gold; color:black; }
+.repeat{ background:#00c853; color:white; }
+.skip{ background:#ff5252; color:white; }
+
+.btn:hover{ transform:scale(1.05); }
+</style>
 </head>
+
 <body>
-  <h2>Dashboard Antrian Bank Prima Nadi</h2>
 
-  <h3>Teller: <span id="teller">0</span></h3>
-  <h3>Customer Service: <span id="cs">0</span></h3>
+<div class="header">DASHBOARD OPERATOR ANTRIAN</div>
 
+<div class="container">
+
+<!-- LOKET 1 -->
+<div class="card">
+  <div class="title">LOKET 1 - TELLER</div>
+  <div id="loket1" class="nomor">-</div>
+  <button class="btn call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
+  <button class="btn repeat" onclick="ulang('loket1')">ULANG</button>
+</div>
+
+<!-- LOKET 2 -->
+<div class="card">
+  <div class="title">LOKET 2 - TELLER</div>
+  <div id="loket2" class="nomor">-</div>
+  <button class="btn call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
+  <button class="btn repeat" onclick="ulang('loket2')">ULANG</button>
+</div>
+
+<!-- LOKET 3 -->
+<div class="card">
+  <div class="title">LOKET 3 - CS</div>
+  <div id="loket3" class="nomor">-</div>
+  <button class="btn call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
+  <button class="btn repeat" onclick="ulang('loket3')">ULANG</button>
+</div>
+
+<!-- LOKET 4 -->
+<div class="card">
+  <div class="title">LOKET 4 - CS</div>
+  <div id="loket4" class="nomor">-</div>
+  <button class="btn call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
+  <button class="btn repeat" onclick="ulang('loket4')">ULANG</button>
+</div>
+
+</div>
+
+<!-- FIREBASE -->
 <script type="module">
 import { db } from './firebase-config.js';
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const tellerRef = ref(db, 'antrian/teller');
-const csRef = ref(db, 'antrian/cs');
+function speak(text){
+  let msg = new SpeechSynthesisUtterance(text);
+  msg.lang="id-ID";
+  speechSynthesis.speak(msg);
+}
 
-onValue(tellerRef, (snapshot) => {
-  if (snapshot.exists()) {
-    document.getElementById("teller").innerText = snapshot.val();
-  }
-});
+window.panggil = async function(type,loket,kode){
 
-onValue(csRef, (snapshot) => {
-  if (snapshot.exists()) {
-    document.getElementById("cs").innerText = snapshot.val();
-  }
+  const antrianRef = ref(db,'antrian/'+type);
+  const snap = await get(antrianRef);
+
+  let nomor = snap.val() || 0;
+  nomor++;
+
+  await update(ref(db,'antrian'),{ [type]:nomor });
+
+  const tampil = kode + nomor.toString().padStart(3,"0");
+
+  await update(ref(db,'loket'),{ [loket]:tampil });
+
+  speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
+}
+
+window.ulang = function(loket){
+  const el = document.getElementById(loket);
+  speak("Nomor "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
+}
+
+/* REALTIME DISPLAY */
+['loket1','loket2','loket3','loket4'].forEach(id=>{
+  onValue(ref(db,'loket/'+id),(snap)=>{
+    if(snap.exists()){
+      document.getElementById(id).innerText = snap.val();
+    }
+  });
 });
 </script>
 
 </body>
 </html>
+
 
 
 
