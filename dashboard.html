@@ -112,59 +112,55 @@ body{
 
 <!-- FIREBASE -->
 <script type="module">
-import { db } from './firebase-config.js';
-import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* CONFIG FIREBASE BOSQUE */
+const firebaseConfig = {
+  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "antrian-bank-prima-nadi",
+  storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+  messagingSenderId: "807742809953",
+  appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
+
+/* INIT */
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* SUARA */
 function speak(text){
-  const msg = new SpeechSynthesisUtterance(text);
+  let msg = new SpeechSynthesisUtterance(text);
   msg.lang="id-ID";
-  msg.rate=0.9;
   speechSynthesis.speak(msg);
 }
 
-/* =========================
-   PANGGIL NOMOR (FIX BANK SYSTEM)
-========================= */
+/* PANGGIL */
 window.panggil = async function(type,loket,kode){
 
-  const antrianRef = ref(db,'antrian/'+type);
-  const snap = await get(antrianRef);
+  const snap = await get(ref(db,'antrian/'+type+'/current'));
+  let nomor = snap.val() || 0;
+  nomor++;
 
-  let data = snap.val();
+  await update(ref(db,'antrian/'+type),{ current: nomor });
 
-  let nomor = data.last + 1;
-
-  /* UPDATE DATABASE */
-  await update(antrianRef,{
-    last: nomor,
-    current: nomor
-  });
-
-  /* FORMAT NOMOR */
   const tampil = kode + nomor.toString().padStart(3,"0");
 
-  /* KIRIM KE LOKET */
-  await update(ref(db,'loket'),{
-    [loket]: tampil
-  });
+  await update(ref(db,'loket'),{ [loket]: tampil });
 
-  /* SUARA */
-  speak("Nomor antrian "+tampil+" silakan ke "+loket.replace("loket","loket "));
+  speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
 }
 
-/* =========================
-   ULANG PANGGIL
-========================= */
+/* ULANG */
 window.ulang = function(loket){
   const el = document.getElementById(loket);
-  if(el.innerText !== "-"){
-    speak("Nomor antrian "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
-  }
+  speak("Nomor "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
 }
 
-/* =========================
-   REALTIME DISPLAY LOKET
-========================= */
+/* REALTIME DISPLAY */
 ['loket1','loket2','loket3','loket4'].forEach(id=>{
   onValue(ref(db,'loket/'+id),(snap)=>{
     if(snap.exists()){
@@ -172,9 +168,11 @@ window.ulang = function(loket){
     }
   });
 });
+
 </script>
 
 
 </body>
 </html>
+
 
