@@ -112,49 +112,39 @@ body{
 
 <!-- FIREBASE -->
 <script type="module">
+import { db } from './firebase-config.js';
+import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* CONFIG FIREBASE BOSQUE */
-const firebaseConfig = {
-  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "antrian-bank-prima-nadi",
-  storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
-  messagingSenderId: "807742809953",
-  appId: "1:807742809953:web:afeb350b36f4731d36c720"
-};
-
-/* INIT */
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-/* SUARA */
 function speak(text){
   let msg = new SpeechSynthesisUtterance(text);
   msg.lang="id-ID";
   speechSynthesis.speak(msg);
 }
 
-/* PANGGIL */
 window.panggil = async function(type,loket,kode){
 
-  const snap = await get(ref(db,'antrian/'+type+'/current'));
+  const antrianRef = ref(db,'antrian/'+type+'/current');
+  const snap = await get(antrianRef);
+
   let nomor = snap.val() || 0;
   nomor++;
 
-  await update(ref(db,'antrian/'+type),{ current: nomor });
+  // update nomor antrian
+  await update(ref(db,'antrian/'+type),{
+    current: nomor,
+    last: nomor
+  });
 
   const tampil = kode + nomor.toString().padStart(3,"0");
 
-  await update(ref(db,'loket'),{ [loket]: tampil });
+  // kirim ke loket
+  await update(ref(db,'loket'),{
+    [loket]: tampil
+  });
 
   speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
 }
 
-/* ULANG */
 window.ulang = function(loket){
   const el = document.getElementById(loket);
   speak("Nomor "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
@@ -168,11 +158,11 @@ window.ulang = function(loket){
     }
   });
 });
-
 </script>
 
 
 </body>
 </html>
+
 
 
