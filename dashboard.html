@@ -1,160 +1,102 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Dashboard Operator - Bank Prima Nadi</title>
+<title>Dashboard Operator</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
 body{
-  margin:0;
-  font-family:Poppins,Arial;
-  background:linear-gradient(135deg,#0b2d57,#1b5fc1);
-  color:white;
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
-/* HEADER */
-.header{
-  background:#0a2445;
-  padding:20px;
-  text-align:center;
-  font-size:28px;
-  font-weight:bold;
-  letter-spacing:2px;
+h1{margin:20px}
+
+.box{
+display:inline-block;
+background:#1e293b;
+padding:30px;
+margin:20px;
+border-radius:15px;
+width:250px;
 }
 
-/* GRID */
-.container{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:25px;
-  padding:30px;
+button{
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#22c55e;
+color:white;
+cursor:pointer;
 }
 
-/* CARD */
-.card{
-  background:#163d6b;
-  border-radius:20px;
-  padding:25px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-.title{
-  font-size:24px;
-  margin-bottom:10px;
-}
-
-.nomor{
-  font-size:70px;
-  color:gold;
-  font-weight:bold;
-  margin:20px 0;
-}
-
-/* BUTTON */
-.btn{
-  padding:15px 25px;
-  border:none;
-  border-radius:10px;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-  margin:5px;
-}
-
-.call{ background:gold; color:black; }
-.repeat{ background:#00c853; color:white; }
-.skip{ background:#ff5252; color:white; }
-
-.btn:hover{ transform:scale(1.05); }
+button:hover{background:#16a34a}
 </style>
 </head>
 
 <body>
 
-<div class="header">DASHBOARD OPERATOR ANTRIAN</div>
+<h1>DASHBOARD OPERATOR</h1>
 
-<div class="container">
-
-<!-- LOKET 1 -->
-<div class="card">
-  <div class="title">LOKET 1 - TELLER</div>
-  <div id="loket1" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket1')">ULANG</button>
+<div class="box">
+<h2>CS</h2>
+<p>Nomor dipanggil: <span id="cs">0</span></p>
+<button onclick="panggil('cs')">PANGGIL</button>
 </div>
 
-<!-- LOKET 2 -->
-<div class="card">
-  <div class="title">LOKET 2 - TELLER</div>
-  <div id="loket2" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket2')">ULANG</button>
+<div class="box">
+<h2>TELLER</h2>
+<p>Nomor dipanggil: <span id="teller">0</span></p>
+<button onclick="panggil('teller')">PANGGIL</button>
 </div>
 
-<!-- LOKET 3 -->
-<div class="card">
-  <div class="title">LOKET 3 - CS</div>
-  <div id="loket3" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket3')">ULANG</button>
-</div>
+<script>
+const firebaseConfig = {
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"antrian-bank-prima-nadi"
+};
 
-<!-- LOKET 4 -->
-<div class="card">
-  <div class="title">LOKET 4 - CS</div>
-  <div id="loket4" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket4')">ULANG</button>
-</div>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-import { db } from './firebase-config.js';
-import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-function speak(text){
-  let msg = new SpeechSynthesisUtterance(text);
-  msg.lang="id-ID";
-  speechSynthesis.speak(msg);
+function panggil(type){
+let ref = db.ref("antrian/"+type);
+ref.once("value").then(snap=>{
+let data = snap.val();
+let next = data.current + 1;
+if(next <= data.last){
+ref.update({current:next});
+suara(type,next);
+}
+});
 }
 
-window.panggil = async function(type,loket,kode){
-
-  const antrianRef = ref(db,'antrian/'+type);
-  const snap = await get(antrianRef);
-
-  let nomor = snap.val() || 0;
-  nomor++;
-
-  await update(ref(db,'antrian'),{ [type]:nomor });
-
-  const tampil = kode + nomor.toString().padStart(3,"0");
-
-  await update(ref(db,'loket'),{ [loket]:tampil });
-
-  speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
+function suara(type,no){
+let text = "Nomor "+type+" "+no+" silakan ke loket";
+let msg = new SpeechSynthesisUtterance(text);
+msg.lang="id-ID";
+speechSynthesis.speak(msg);
 }
 
-window.ulang = function(loket){
-  const el = document.getElementById(loket);
-  speak("Nomor "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
-}
+db.ref("antrian/cs/current").on("value",snap=>{
+document.getElementById("cs").innerText=snap.val();
+});
 
-/* REALTIME DISPLAY */
-['loket1','loket2','loket3','loket4'].forEach(id=>{
-  onValue(ref(db,'loket/'+id),(snap)=>{
-    if(snap.exists()){
-      document.getElementById(id).innerText = snap.val();
-    }
-  });
+db.ref("antrian/teller/current").on("value",snap=>{
+document.getElementById("teller").innerText=snap.val();
 });
 </script>
 
 </body>
 </html>
+
 
 
 
