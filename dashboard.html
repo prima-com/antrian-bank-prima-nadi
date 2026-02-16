@@ -2,22 +2,21 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator - Bank Prima Nadi</title>
+<title>Dashboard Operator</title>
 
 <style>
 body{
   margin:0;
-  font-family:Poppins,Arial;
+  font-family:Poppins;
   background:linear-gradient(135deg,#0b2d57,#1b5fc1);
   color:white;
 }
 
 .header{
-  background:#0a2445;
   padding:20px;
   text-align:center;
   font-size:28px;
-  font-weight:bold;
+  background:#0a2445;
 }
 
 .container{
@@ -32,75 +31,78 @@ body{
   border-radius:20px;
   padding:25px;
   text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-.title{
-  font-size:22px;
 }
 
 .nomor{
   font-size:70px;
   color:gold;
-  font-weight:bold;
   margin:20px 0;
 }
 
-.btn{
-  padding:15px 25px;
+button{
+  padding:12px 20px;
+  font-size:16px;
+  margin:5px;
   border:none;
   border-radius:10px;
-  font-size:18px;
-  font-weight:bold;
   cursor:pointer;
-  margin:5px;
 }
 
-.call{ background:gold; color:black; }
+.call{ background:gold; }
 .repeat{ background:#00c853; color:white; }
-
 </style>
 </head>
 
 <body>
 
-<div class="header">DASHBOARD OPERATOR ANTRIAN</div>
+<div class="header">DASHBOARD OPERATOR</div>
 
 <div class="container">
 
 <div class="card">
-  <div class="title">LOKET 1 - TELLER</div>
-  <div id="loket1" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket1')">ULANG</button>
+<h3>LOKET 1</h3>
+<div id="loket1" class="nomor">-</div>
+<button class="call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
+<button class="repeat" onclick="ulang('loket1')">ULANG</button>
 </div>
 
 <div class="card">
-  <div class="title">LOKET 2 - TELLER</div>
-  <div id="loket2" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket2')">ULANG</button>
+<h3>LOKET 2</h3>
+<div id="loket2" class="nomor">-</div>
+<button class="call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
+<button class="repeat" onclick="ulang('loket2')">ULANG</button>
 </div>
 
 <div class="card">
-  <div class="title">LOKET 3 - CS</div>
-  <div id="loket3" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket3')">ULANG</button>
+<h3>LOKET 3</h3>
+<div id="loket3" class="nomor">-</div>
+<button class="call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
+<button class="repeat" onclick="ulang('loket3')">ULANG</button>
 </div>
 
 <div class="card">
-  <div class="title">LOKET 4 - CS</div>
-  <div id="loket4" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket4')">ULANG</button>
+<h3>LOKET 4</h3>
+<div id="loket4" class="nomor">-</div>
+<button class="call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
+<button class="repeat" onclick="ulang('loket4')">ULANG</button>
 </div>
 
 </div>
 
 <script type="module">
-import { db } from './firebase-config.js';
-import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "antrian-bank-prima-nadi",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 function speak(text){
   let msg = new SpeechSynthesisUtterance(text);
@@ -110,9 +112,7 @@ function speak(text){
 
 window.panggil = async function(type,loket,kode){
 
-  const antrianRef = ref(db,'antrian/'+type+'/current');
-  const snap = await get(antrianRef);
-
+  const snap = await get(ref(db,'antrian/'+type+'/current'));
   let nomor = snap.val() || 0;
   nomor++;
 
@@ -131,11 +131,10 @@ window.panggil = async function(type,loket,kode){
 }
 
 window.ulang = function(loket){
-  const el = document.getElementById(loket);
-  speak("Nomor "+el.innerText+" silakan ke "+loket.replace("loket","loket "));
+  speak("Nomor "+document.getElementById(loket).innerText);
 }
 
-/* REALTIME DISPLAY */
+/* REALTIME LISTENER */
 ['loket1','loket2','loket3','loket4'].forEach(id=>{
   onValue(ref(db,'loket/'+id),(snap)=>{
     if(snap.exists()){
@@ -143,11 +142,8 @@ window.ulang = function(loket){
     }
   });
 });
+
 </script>
 
 </body>
 </html>
-
-
-
-
