@@ -2,261 +2,67 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Display Antrian Bank</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Display Antrian</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#0b2d57;
-  color:white;
-}
-
-/* HEADER */
-.header{
-  height:70px;
-  background:#1d4c84;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 30px;
-  font-size:32px;
-  font-weight:bold;
-}
-
-.led{
-  font-size:14px;
-  font-weight:bold;
-  letter-spacing:2px;
-  color:#FFD700;
-  text-shadow:
-      0 0 5px #FFD700,
-      0 0 10px #FFD700,
-      0 0 20px rgba(255,215,0,0.8);
-}
-
-/* LAYOUT UTAMA */
-.container{
-  display:flex;
-  height:62vh;
-  padding:15px;
-  gap:15px;
-  box-sizing:border-box;
-}
-
-/* PANEL KIRI */
-.left{
-  width:28%;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.box{
-  background:#2a638a;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-}
-
-.small{ height:12%; }
-.big{ height:38%; }
-
-.title{
-  font-size:2.2vh;
-  font-weight:bold;
-}
-
-.nomor{
-  font-size:8vh;
-  font-weight:bold;
-  color:gold;
-}
-
-/* TV */
-.tv{
-  width:45%;
-  border-radius:15px;
-  overflow:hidden;
-  background:black;
-}
-
-.tv iframe{
-  width:100%;
-  height:100%;
-  border:none;
-}
-
-/* PANEL PROMO */
-.promo{
-  width:27%;
-  background:#163d6b;
-  border-radius:15px;
-  padding:15px;
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-.promo h2{
-  margin:0;
-  text-align:center;
-  font-size:2.5vh;
-}
-
-.promo-card{
-  background:#2a638a;
-  border-radius:12px;
-  padding:15px;
-  font-size:2vh;
-}
-
-/* MINI LOKET */
-.mini{
-  display:flex;
-  gap:12px;
-  padding:20px 15px 10px 15px;
-  margin-top:25px;
-}
-
-.loket{
-  flex:1;
-  background:#163d6b;
-  border-radius:12px;
-  padding:10px;
-  text-align:center;
-}
-
-.loket h3{
-  margin:0;
-  font-size:2vh;
-}
-
-.loket span{
-  font-size:3vh;
-  color:gold;
-  font-weight:bold;
-}
-
-/* RUNNING TEXT */
-.running{
-  background:#0a2445;
-  color:yellow;
-  font-size:2.5vh;
-  padding:10px;
-  font-weight:bold;
-  white-space:nowrap;
-  overflow:hidden;
-}
-
-.running div{
-  display:inline-block;
-  padding-left:100%;
-  animation:jalan 20s linear infinite;
-}
-
-@keyframes jalan{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(-100%);}
-}
+body{font-family:Arial;background:black;color:white;text-align:center}
+.loket{display:inline-block;margin:40px;font-size:40px}
+.nomor{font-size:80px;font-weight:bold;color:yellow}
 </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <img src="logo_pn.png" height="100%">
-  <div id="jam" class="led"></div>
+<h1>ANTRIAN BANK</h1>
+
+<div class="loket">
+<div>LOKET 1</div>
+<div id="loket1" class="nomor">-</div>
 </div>
 
-<!-- LAYOUT -->
-<div class="container">
-
-  <!-- PANEL ANTRIAN -->
-  <div class="left">
-
-    <div class="box small">
-      <div class="title">LOKET A</div>
-    </div>
-
-    <div class="box big">
-      <div class="title">NOMOR ANTRIAN</div>
-      <div class="nomor">A 015</div>
-    </div>
-
-    <div class="box small">
-      <div class="title">LOKET B</div>
-    </div>
-
-    <div class="box big">
-      <div class="title">NOMOR ANTRIAN</div>
-      <div class="nomor">B 006</div>
-    </div>
-
-  </div>
-
-  <!-- TV -->
-  <div class="tv">
-    <iframe src="https://www.youtube.com/embed/U0yH4fbdcbs?autoplay=1&mute=1"></iframe>
-  </div>
-
-  <!-- PANEL PROMO -->
-  <div class="promo">
-
-    <h2>PROMO BANK</h2>
-
-    <div class="promo-card">
-      🎁 Tabungan Prima Senyum<br>
-      Hadiah Motor PCX 160
-    </div>
-
-    <div class="promo-card">
-      💳 Kredit UMKM Cepat Cair<br>
-      Proses Cepat & Mudah
-    </div>
-
-    <div class="promo-card">
-      📱 Mobile Banking Prima<br>
-      Transaksi Lebih Praktis
-    </div>
-
-  </div>
-
+<div class="loket">
+<div>LOKET 2</div>
+<div id="loket2" class="nomor">-</div>
 </div>
 
-<!-- MINI LOKET -->
-<div class="mini">
-  <div class="loket"><h3>LOKET 1</h3><span>A 015</span></div>
-  <div class="loket"><h3>LOKET 2</h3><span>A 011</span></div>
-  <div class="loket"><h3>LOKET 3</h3><span>A 012</span></div>
-  <div class="loket"><h3>LOKET 4</h3><span>B 013</span></div>
+<div class="loket">
+<div>LOKET 3</div>
+<div id="loket3" class="nomor">-</div>
 </div>
 
-<!-- RUNNING TEXT -->
-<div class="running">
-  <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
+<div class="loket">
+<div>LOKET 4</div>
+<div id="loket4" class="nomor">-</div>
 </div>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-function updateJam(){
-  const now = new Date();
-  const hari = now.toLocaleDateString("id-ID",{weekday:"long"});
-  const tanggal = now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
-  const jam = now.toLocaleTimeString("id-ID");
+const firebaseConfig = {
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi",
+storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+messagingSenderId: "807742809953",
+appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
 
-  document.getElementById("jam").innerHTML =
-    hari+", "+tanggal+"<br>Pukul "+jam;
-}
-setInterval(updateJam,1000);
-updateJam();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+["loket1","loket2","loket3","loket4"].forEach(id=>{
+db.ref("loket/"+id).on("value",snap=>{
+document.getElementById(id).innerText = snap.val() || "-";
+});
+});
 </script>
 
 </body>
 </html>
+
 
 
 
