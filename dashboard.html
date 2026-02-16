@@ -3,83 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antrian Bank Pro</title>
+<title>Dashboard Operator</title>
 
 <style>
-body{
-    font-family: Arial, sans-serif;
-    background:#0d47a1;
-    color:white;
-    text-align:center;
-    margin:0;
-}
-
-.container{
-    padding:20px;
-}
-
-.nomor{
-    font-size:120px;
-    font-weight:bold;
-    margin:20px 0;
-}
-
-button{
-    padding:15px 30px;
-    font-size:18px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    margin:10px;
-}
-
-.btn-panggil{ background:#4caf50; color:white; }
-.btn-ulang{ background:#ff9800; color:white; }
+body{font-family:Arial;text-align:center;background:#f2f2f2}
+button{padding:15px 25px;margin:8px;font-size:18px;border:none;border-radius:8px;cursor:pointer}
+.panggil{background:#28a745;color:white}
+.ulang{background:#ffc107}
+.box{background:white;padding:20px;border-radius:10px;display:inline-block;margin:10px}
+.nomor{font-size:32px;font-weight:bold}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>ANTRIAN BANK</h1>
-    <div id="nomor" class="nomor">A001</div>
+<h2>DASHBOARD OPERATOR</h2>
 
-    <button class="btn-panggil" onclick="panggil()">Panggil</button>
-    <button class="btn-ulang" onclick="ulang()">Ulangi Suara</button>
+<div class="box">
+<h3>Loket 1</h3>
+<div id="loket1" class="nomor">-</div>
+<button class="panggil" onclick="panggil('cs','loket1','A')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket1')">ULANG</button>
 </div>
 
-<!-- AUDIO -->
-<audio id="audio">
-    <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3" type="audio/mpeg">
-</audio>
+<div class="box">
+<h3>Loket 2</h3>
+<div id="loket2" class="nomor">-</div>
+<button class="panggil" onclick="panggil('teller','loket2','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket2')">ULANG</button>
+</div>
+
+<div class="box">
+<h3>Loket 3</h3>
+<div id="loket3" class="nomor">-</div>
+<button class="panggil" onclick="panggil('teller','loket3','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket3')">ULANG</button>
+</div>
+
+<div class="box">
+<h3>Loket 4</h3>
+<div id="loket4" class="nomor">-</div>
+<button class="panggil" onclick="panggil('teller','loket4','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket4')">ULANG</button>
+</div>
+
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-let nomorSekarang = 1;
+const firebaseConfig = {
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi",
+storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+messagingSenderId: "807742809953",
+appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
 
-function formatNomor(n){
-    return "A" + String(n).padStart(3,"0");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+// =======================
+// FUNGSI SUARA FIX
+// =======================
+function speak(teks){
+
+    speechSynthesis.cancel(); // reset suara lama
+
+    const msg = new SpeechSynthesisUtterance(teks);
+    msg.lang = "id-ID";
+    msg.rate = 0.9;
+    msg.pitch = 1;
+
+    speechSynthesis.speak(msg);
 }
 
-function bunyikan(){
-    let audio = document.getElementById("audio");
-    audio.pause();
-    audio.currentTime = 0;
-    audio.play();
+
+// =======================
+// PANGGIL NOMOR
+// =======================
+function panggil(type,loket,kode){
+
+    const ref = db.ref("antrian/"+type+"/current");
+
+    ref.once("value").then(snapshot => {
+
+        let nomor = snapshot.val() || 0;
+        nomor++;
+
+        ref.set(nomor);
+
+        const tampil = kode + nomor.toString().padStart(3,"0");
+
+        db.ref("loket/"+loket).set(tampil);
+
+        const noBaca = tampil.replace(/^([A-Z])0+/, "$1 ");
+
+        speak("Nomor antrian " + noBaca.split("").join(" ") + 
+              " silakan menuju " + loket.replace("loket","loket "));
+    });
 }
 
-function panggil(){
-    nomorSekarang++;
-    document.getElementById("nomor").innerText = formatNomor(nomorSekarang);
-    bunyikan();
+
+// =======================
+// ULANG PANGGILAN
+// =======================
+function ulang(loket){
+
+    db.ref("loket/"+loket).once("value").then(snapshot => {
+
+        let nomor = snapshot.val();
+
+        if(!nomor) return;
+
+        const noBaca = nomor.replace(/^([A-Z])0+/, "$1 ");
+
+        speak("Nomor antrian " + noBaca.split("").join(" ") + 
+              " silakan menuju " + loket.replace("loket","loket "));
+    });
 }
 
-function ulang(){
-    bunyikan();
-}
+
+// =======================
+// LISTENER REALTIME
+// =======================
+["loket1","loket2","loket3","loket4"].forEach(id=>{
+
+    db.ref("loket/"+id).on("value", snap => {
+
+        document.getElementById(id).innerText = snap.val() || "-";
+
+    });
+
+});
 </script>
 
 </body>
 </html>
+
 
 
 
