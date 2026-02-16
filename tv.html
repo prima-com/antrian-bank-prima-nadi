@@ -1,67 +1,171 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Display Antrian</title>
+<title>Display Antrian Bank</title>
 
 <style>
-body{font-family:Arial;background:black;color:white;text-align:center}
-.loket{display:inline-block;margin:40px;font-size:40px}
-.nomor{font-size:80px;font-weight:bold;color:yellow}
+body{
+    margin:0;
+    font-family: Arial;
+    background:#0d2d57;
+    color:white;
+}
+
+.header{
+    background:#1e4c8a;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:30px;
+    font-weight:bold;
+}
+
+.time{
+    color:yellow;
+    font-size:18px;
+}
+
+.main{
+    display:grid;
+    grid-template-columns: 25% 50% 25%;
+    gap:20px;
+    padding:20px;
+}
+
+.box{
+    background:#2e5f85;
+    border-radius:15px;
+    padding:20px;
+    text-align:center;
+}
+
+.nomor{
+    font-size:60px;
+    color:yellow;
+    font-weight:bold;
+}
+
+.video{
+    background:black;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.video iframe{
+    width:100%;
+    height:100%;
+    border:0;
+}
+
+.bottom{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:20px;
+    padding:20px;
+}
+
+.loket{
+    background:#1e4c8a;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.running{
+    text-align:center;
+    background:black;
+    color:yellow;
+    padding:10px;
+    font-weight:bold;
+}
 </style>
 </head>
+
 <body>
 
-<h1>ANTRIAN BANK</h1>
-
-<div class="loket">
-<div>LOKET 1</div>
-<div id="loket1" class="nomor">-</div>
+<div class="header">
+<div class="logo">PT. BPR PRIMA NADI</div>
+<div class="time" id="clock"></div>
 </div>
 
-<div class="loket">
-<div>LOKET 2</div>
-<div id="loket2" class="nomor">-</div>
+<div class="main">
+
+<div>
+<div class="box">
+LOKET A<br>
+<div class="nomor" id="loketA">-</div>
 </div>
 
-<div class="loket">
-<div>LOKET 3</div>
-<div id="loket3" class="nomor">-</div>
+<br>
+
+<div class="box">
+LOKET B<br>
+<div class="nomor" id="loketB">-</div>
+</div>
 </div>
 
-<div class="loket">
-<div>LOKET 4</div>
-<div id="loket4" class="nomor">-</div>
+<div class="video">
+<iframe src="https://www.youtube.com/embed/videoseries?list=PL4cUxeGkcC9jAhrjtZ9U93UM0I9J1h1F0&autoplay=1&mute=1"></iframe>
 </div>
 
+<div class="box">
+<h3>PROMO BANK</h3>
+<p>🎁 Tabungan Prima Senyum</p>
+<p>💳 Kredit UMKM Cepat Cair</p>
+<p>📱 Mobile Banking Prima</p>
+</div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</div>
 
-<script>
-const firebaseConfig = {
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi",
-storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
-messagingSenderId: "807742809953",
-appId: "1:807742809953:web:afeb350b36f4731d36c720"
-};
+<div class="bottom">
+<div class="loket">LOKET 1<br><span id="l1"></span></div>
+<div class="loket">LOKET 2<br><span id="l2"></span></div>
+<div class="loket">LOKET 3<br><span id="l3"></span></div>
+<div class="loket">LOKET 4<br><span id="l4"></span></div>
+</div>
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+<div class="running">
+Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil
+</div>
 
-["loket1","loket2","loket3","loket4"].forEach(id=>{
-db.ref("loket/"+id).on("value",snap=>{
-document.getElementById(id).innerText = snap.val() || "-";
+<!-- FIREBASE -->
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+function updateClock(){
+    document.getElementById("clock").innerText =
+    new Date().toLocaleString("id-ID");
+}
+setInterval(updateClock,1000);
+
+const callRef = ref(db,"currentCall");
+
+onValue(callRef, snap=>{
+    const data = snap.val();
+    if(!data) return;
+
+    document.getElementById("loketA").innerText = data.loket1 || "-";
+    document.getElementById("loketB").innerText = data.loket2 || "-";
+
+    document.getElementById("l1").innerText = data.loket1 || "-";
+    document.getElementById("l2").innerText = data.loket2 || "-";
+    document.getElementById("l3").innerText = data.loket3 || "-";
+    document.getElementById("l4").innerText = data.loket4 || "-";
 });
-});
+
 </script>
 
 </body>
 </html>
+
+
 
 
 
