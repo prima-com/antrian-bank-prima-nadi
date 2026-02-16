@@ -2,147 +2,104 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Operator</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Poppins;
-  background:linear-gradient(135deg,#0b2d57,#1b5fc1);
-  color:white;
-}
-
-.header{
-  padding:20px;
-  text-align:center;
-  font-size:28px;
-  background:#0a2445;
-}
-
-.container{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:25px;
-  padding:30px;
-}
-
-.card{
-  background:#163d6b;
-  border-radius:20px;
-  padding:25px;
-  text-align:center;
-}
-
-.nomor{
-  font-size:70px;
-  color:gold;
-  margin:20px 0;
-}
-
-button{
-  padding:12px 20px;
-  font-size:16px;
-  margin:5px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.call{ background:gold; }
-.repeat{ background:#00c853; color:white; }
+body{font-family:Arial;text-align:center;background:#f2f2f2}
+button{padding:15px 25px;margin:8px;font-size:18px;border:none;border-radius:8px;cursor:pointer}
+.panggil{background:#28a745;color:white}
+.ulang{background:#ffc107}
+.box{background:white;padding:20px;border-radius:10px;display:inline-block;margin:10px}
+.nomor{font-size:32px;font-weight:bold}
 </style>
 </head>
-
 <body>
 
-<div class="header">DASHBOARD OPERATOR</div>
+<h2>DASHBOARD OPERATOR</h2>
 
-<div class="container">
-
-<div class="card">
-<h3>LOKET 1</h3>
+<div class="box">
+<h3>Loket 1</h3>
 <div id="loket1" class="nomor">-</div>
-<button class="call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
-<button class="repeat" onclick="ulang('loket1')">ULANG</button>
+<br>
+<button class="panggil" onclick="panggil('cs','loket1','A')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket1')">ULANG</button>
 </div>
 
-<div class="card">
-<h3>LOKET 2</h3>
+<div class="box">
+<h3>Loket 2</h3>
 <div id="loket2" class="nomor">-</div>
-<button class="call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
-<button class="repeat" onclick="ulang('loket2')">ULANG</button>
+<br>
+<button class="panggil" onclick="panggil('teller','loket2','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket2')">ULANG</button>
 </div>
 
-<div class="card">
-<h3>LOKET 3</h3>
+<div class="box">
+<h3>Loket 3</h3>
 <div id="loket3" class="nomor">-</div>
-<button class="call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
-<button class="repeat" onclick="ulang('loket3')">ULANG</button>
+<br>
+<button class="panggil" onclick="panggil('teller','loket3','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket3')">ULANG</button>
 </div>
 
-<div class="card">
-<h3>LOKET 4</h3>
+<div class="box">
+<h3>Loket 4</h3>
 <div id="loket4" class="nomor">-</div>
-<button class="call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
-<button class="repeat" onclick="ulang('loket4')">ULANG</button>
+<br>
+<button class="panggil" onclick="panggil('teller','loket4','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket4')">ULANG</button>
 </div>
 
-</div>
 
-<script type="module">
+<!-- FIREBASE COMPAT -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+<script>
 const firebaseConfig = {
-  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "antrian-bank-prima-nadi",
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi",
+storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+messagingSenderId: "807742809953",
+appId: "1:807742809953:web:afeb350b36f4731d36c720"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 function speak(text){
-  let msg = new SpeechSynthesisUtterance(text);
-  msg.lang="id-ID";
-  speechSynthesis.speak(msg);
+let msg = new SpeechSynthesisUtterance(text);
+msg.lang="id-ID";
+speechSynthesis.speak(msg);
 }
 
-window.panggil = async function(type,loket,kode){
+function panggil(type,loket,kode){
+db.ref("antrian/"+type+"/current").once("value",snap=>{
+let nomor = snap.val() || 0;
+nomor++;
 
-  const snap = await get(ref(db,'antrian/'+type+'/current'));
-  let nomor = snap.val() || 0;
-  nomor++;
+db.ref("antrian/"+type).update({current:nomor});
 
-  await update(ref(db,'antrian/'+type),{
-    current: nomor,
-    last: nomor
-  });
+let tampil = kode + nomor.toString().padStart(3,"0");
+db.ref("loket/"+loket).set(tampil);
 
-  const tampil = kode + nomor.toString().padStart(3,"0");
-
-  await update(ref(db,'loket'),{
-    [loket]: tampil
-  });
-
-  speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
-}
-
-window.ulang = function(loket){
-  speak("Nomor "+document.getElementById(loket).innerText);
-}
-
-/* REALTIME LISTENER */
-['loket1','loket2','loket3','loket4'].forEach(id=>{
-  onValue(ref(db,'loket/'+id),(snap)=>{
-    if(snap.exists()){
-      document.getElementById(id).innerText = snap.val();
-    }
-  });
+speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
 });
+}
 
+function ulang(loket){
+db.ref("loket/"+loket).once("value",snap=>{
+speak("Nomor "+snap.val()+" silakan ke "+loket.replace("loket","loket "));
+});
+}
+
+["loket1","loket2","loket3","loket4"].forEach(id=>{
+db.ref("loket/"+id).on("value",snap=>{
+document.getElementById(id).innerText = snap.val() || "-";
+});
+});
 </script>
 
 </body>
