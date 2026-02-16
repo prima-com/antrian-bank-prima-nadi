@@ -13,7 +13,7 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 }
 
 .led{
-  font-size:16px;font-weight:bold;letter-spacing:2px;color:#FFD700;
+  font-size:22px;font-weight:bold;letter-spacing:2px;color:#FFD700;
   text-shadow:0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
 }
 
@@ -65,10 +65,36 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
   0%{transform:translateX(0);}
   100%{transform:translateX(-100%);}
 }
+
+/* BUTTON UNLOCK AUDIO */
+#unlock{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:#000c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
 </style>
 </head>
 
 <body>
+
+<!-- 🔊 UNLOCK AUDIO -->
+<div id="unlock">
+  <button onclick="aktifkanSuara()" style="
+    font-size:30px;
+    padding:20px 40px;
+    background:gold;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+  ">
+  🔊 AKTIFKAN SUARA
+  </button>
+</div>
 
 <div class="header">
   <img src="logo_pn.png" height="100%">
@@ -114,16 +140,22 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 import { db } from "./firebase-config.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* ===== SUARA ===== */
+let audioAktif=false;
+let lastCalled={};
+
+window.aktifkanSuara=function(){
+  audioAktif=true;
+  speechSynthesis.speak(new SpeechSynthesisUtterance("Suara aktif"));
+  document.getElementById("unlock").style.display="none";
+};
+
 function speak(text){
-  const msg = new SpeechSynthesisUtterance(text);
+  if(!audioAktif) return;
+  const msg=new SpeechSynthesisUtterance(text);
   msg.lang="id-ID";
   msg.rate=0.9;
   speechSynthesis.speak(msg);
 }
-
-/* ===== LISTENER ===== */
-let lastCalled={};
 
 function listenLoket(id){
   onValue(ref(db,"loket/"+id),(snap)=>{
@@ -161,6 +193,8 @@ updateJam();
 
 </body>
 </html>
+
+
 
 
 
