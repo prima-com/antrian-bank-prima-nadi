@@ -2,162 +2,84 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator - Bank Prima Nadi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antrian Bank Pro</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Poppins,Arial;
-  background:linear-gradient(135deg,#0b2d57,#1b5fc1);
-  color:white;
-}
-
-.header{
-  background:#0a2445;
-  padding:20px;
-  text-align:center;
-  font-size:28px;
-  font-weight:bold;
+    font-family: Arial, sans-serif;
+    background:#0d47a1;
+    color:white;
+    text-align:center;
+    margin:0;
 }
 
 .container{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:25px;
-  padding:30px;
+    padding:20px;
 }
-
-.card{
-  background:#163d6b;
-  border-radius:20px;
-  padding:25px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-.title{font-size:24px;}
 
 .nomor{
-  font-size:70px;
-  color:gold;
-  font-weight:bold;
-  margin:20px 0;
+    font-size:120px;
+    font-weight:bold;
+    margin:20px 0;
 }
 
-.btn{
-  padding:15px 25px;
-  border:none;
-  border-radius:10px;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-  margin:5px;
+button{
+    padding:15px 30px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin:10px;
 }
 
-.call{ background:gold; color:black; }
-.repeat{ background:#00c853; color:white; }
-
-.btn:hover{ transform:scale(1.05); }
+.btn-panggil{ background:#4caf50; color:white; }
+.btn-ulang{ background:#ff9800; color:white; }
 </style>
 </head>
 
 <body>
 
-<div class="header">DASHBOARD OPERATOR ANTRIAN</div>
-
 <div class="container">
+    <h1>ANTRIAN BANK</h1>
+    <div id="nomor" class="nomor">A001</div>
 
-<div class="card">
-  <div class="title">LOKET 1 - TELLER</div>
-  <div id="loket1" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket1','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket1')">ULANG</button>
+    <button class="btn-panggil" onclick="panggil()">Panggil</button>
+    <button class="btn-ulang" onclick="ulang()">Ulangi Suara</button>
 </div>
 
-<div class="card">
-  <div class="title">LOKET 2 - TELLER</div>
-  <div id="loket2" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('teller','loket2','A')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket2')">ULANG</button>
-</div>
+<!-- AUDIO -->
+<audio id="audio">
+    <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3" type="audio/mpeg">
+</audio>
 
-<div class="card">
-  <div class="title">LOKET 3 - CS</div>
-  <div id="loket3" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket3','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket3')">ULANG</button>
-</div>
+<script>
+let nomorSekarang = 1;
 
-<div class="card">
-  <div class="title">LOKET 4 - CS</div>
-  <div id="loket4" class="nomor">-</div>
-  <button class="btn call" onclick="panggil('cs','loket4','B')">PANGGIL</button>
-  <button class="btn repeat" onclick="ulang('loket4')">ULANG</button>
-</div>
-
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-import { db } from "./firebase-config.js";
-import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* ===== SUARA OPERATOR ===== */
-function speak(text){
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.lang="id-ID";
-  speechSynthesis.speak(msg);
+function formatNomor(n){
+    return "A" + String(n).padStart(3,"0");
 }
 
-/* ===== PANGGIL ===== */
-window.panggil = async function(type,loket,kode){
-
-  const antrianRef = ref(db,'antrian/'+type);
-  const snap = await get(antrianRef);
-
-  let nomor = snap.val() || 0;
-  nomor++;
-
-  await update(ref(db,'antrian'),{ [type]:nomor });
-
-  const tampil = kode + nomor.toString().padStart(3,"0");
-
-  await update(ref(db,'loket'),{ [loket]:tampil });
-
-  speak("Nomor "+tampil+" silakan ke "+loket.replace("loket","loket "));
+function bunyikan(){
+    let audio = document.getElementById("audio");
+    audio.pause();
+    audio.currentTime = 0;
+    audio.play();
 }
 
-/* ===== ULANG (FIX PRO) ===== */
-window.ulang = async function(loket){
-
-  const nomor = document.getElementById(loket).innerText;
-
-  if(!nomor || nomor === "-") return;
-
-  // trigger realtime ulang
-  await update(ref(db,"loket"),{
-    [loket]: nomor + " "
-  });
-
-  setTimeout(()=>{
-    update(ref(db,"loket"),{
-      [loket]: nomor
-    });
-  },300);
-
+function panggil(){
+    nomorSekarang++;
+    document.getElementById("nomor").innerText = formatNomor(nomorSekarang);
+    bunyikan();
 }
 
-/* ===== REALTIME DISPLAY ===== */
-['loket1','loket2','loket3','loket4'].forEach(id=>{
-  onValue(ref(db,'loket/'+id),(snap)=>{
-    if(snap.exists()){
-      document.getElementById(id).innerText = snap.val();
-    }
-  });
-});
+function ulang(){
+    bunyikan();
+}
 </script>
 
 </body>
 </html>
+
 
 
