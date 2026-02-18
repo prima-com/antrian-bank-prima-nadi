@@ -5,59 +5,119 @@
 <title>Display Antrian Bank</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b2d57;
+  color:white;
+}
 
 .header{
-  height:70px;background:#1d4c84;display:flex;
-  align-items:center;justify-content:space-between;padding:0 30px;
+  height:70px;
+  background:#1d4c84;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
 }
 
 .led{
-  font-size:16px;font-weight:bold;letter-spacing:2px;color:#FFD700;
-  text-shadow:0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
+  font-size:16px;
+  font-weight:bold;
+  letter-spacing:2px;
+  color:#FFD700;
+  text-shadow:0 0 5px #FFD700;
 }
 
-.container{display:flex;height:62vh;padding:15px;gap:15px;}
+.container{
+  display:flex;
+  height:62vh;
+  padding:15px;
+  gap:15px;
+}
 
-.left{width:25%;display:flex;flex-direction:column;gap:12px;}
+.left{
+  width:28%;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
 .box{
-  background:#2a638a;border-radius:15px;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  background:#2a638a;
+  border-radius:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
 .small{height:12%;}
 .big{height:38%;}
 
-.title{font-size:2.2vh;font-weight:bold;}
+.title{
+  font-size:2.2vh;
+  font-weight:bold;
+}
 
-.nomor{font-size:8vh;font-weight:bold;color:gold;}
+.nomor{
+  font-size:8vh;
+  font-weight:bold;
+  color:gold;
+}
 
-.tv{width:48%;border-radius:15px;overflow:hidden;}
-.tv iframe{width:100%;height:100%;border:none;}
+.tv{
+  width:45%;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+.tv iframe{
+  width:100%;
+  height:100%;
+  border:none;
+}
 
 .promo{
-  width:27%;background:#163d6b;border-radius:15px;padding:15px;
-  display:flex;flex-direction:column;gap:15px;
+  width:27%;
+  background:#163d6b;
+  border-radius:15px;
+  padding:15px;
 }
 
-.promo-card{background:#2a638a;border-radius:12px;padding:15px;}
-
-.mini{display:flex;gap:12px;padding:20px 15px;}
+.mini{
+  display:flex;
+  gap:12px;
+  padding:20px 15px;
+}
 
 .loket{
-  flex:1;background:#163d6b;border-radius:12px;padding:10px;text-align:center;
+  flex:1;
+  background:#163d6b;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
 }
 
-.loket span{font-size:3vh;color:gold;font-weight:bold;}
+.loket span{
+  font-size:3vh;
+  color:gold;
+  font-weight:bold;
+}
 
 .running{
-  background:#0a2445;color:yellow;font-size:2.5vh;padding:10px;
-  font-weight:bold;white-space:nowrap;overflow:hidden;
+  background:#0a2445;
+  color:yellow;
+  font-size:2.5vh;
+  padding:10px;
+  font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
 }
 
 .running div{
-  display:inline-block;padding-left:100%;
+  display:inline-block;
+  padding-left:100%;
   animation:jalan 20s linear infinite;
 }
 
@@ -66,11 +126,14 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
   100%{transform:translateX(-100%);}
 }
 
-/* BUTTON UNLOCK AUDIO */
+
+/* UNLOCK AUDIO */
 #unlock{
   position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   background:#000c;
   display:flex;
   align-items:center;
@@ -82,117 +145,252 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 
 <body>
 
-<!-- 🔊 UNLOCK AUDIO -->
+<!-- UNLOCK AUDIO -->
 <div id="unlock">
-  <button onclick="aktifkanSuara()" style="
-    font-size:30px;
-    padding:20px 40px;
-    background:gold;
-    border:none;
-    border-radius:15px;
-    cursor:pointer;
-  ">
-  🔊 AKTIFKAN SUARA
-  </button>
+<button onclick="aktifkanSuara()" style="
+font-size:30px;
+padding:20px 40px;
+background:gold;
+border:none;
+border-radius:15px;
+cursor:pointer;
+">
+🔊 AKTIFKAN SUARA
+</button>
 </div>
 
+
 <div class="header">
-  <img src="logo_pn.png" height="100%">
-  <div id="jam" class="led"></div>
+
+<img src="logo_pn.png" height="100%">
+
+<div id="jam" class="led"></div>
+
 </div>
+
 
 <div class="container">
 
 <div class="left">
-  <div class="box small"><div class="title">LOKET A</div></div>
-  <div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayA">A000</div></div>
 
-  <div class="box small"><div class="title">LOKET B</div></div>
-  <div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayB">B000</div></div>
+<div class="box small">
+<div class="title">LOKET A</div>
 </div>
+
+<div class="box big">
+<div class="title">NOMOR ANTRIAN</div>
+<div class="nomor" id="displayA">-</div>
+</div>
+
+
+<div class="box small">
+<div class="title">LOKET B</div>
+</div>
+
+<div class="box big">
+<div class="title">NOMOR ANTRIAN</div>
+<div class="nomor" id="displayB">-</div>
+</div>
+
+</div>
+
 
 <div class="tv">
-  <iframe src="https://www.youtube.com/embed/yNKvkPJl-tg?autoplay=1&mute=1"></iframe>
+
+<iframe src="https://www.youtube.com/embed/yNKvkPJl-tg?autoplay=1&mute=1"></iframe>
+
 </div>
+
 
 <div class="promo">
-  <h2>PROMO BANK</h2>
-  <div class="promo-card">🎁 Tabungan Prima Senyum<br>Hadiah Motor PCX 160</div>
-  <div class="promo-card">💳 Kredit UMKM Cepat Cair</div>
-  <div class="promo-card">📱 Mobile Banking Prima</div>
+
+<h2>PROMO BANK</h2>
+
+<div>🎁 Tabungan Prima Senyum</div>
+<div>💳 Kredit UMKM Cepat Cair</div>
+<div>📱 Mobile Banking Prima</div>
+
 </div>
 
 </div>
+
 
 <div class="mini">
-  <div class="loket"><h3>LOKET 1</h3><span id="loket1">-</span></div>
-  <div class="loket"><h3>LOKET 2</h3><span id="loket2">-</span></div>
-  <div class="loket"><h3>LOKET 3</h3><span id="loket3">-</span></div>
-  <div class="loket"><h3>LOKET 4</h3><span id="loket4">-</span></div>
+
+<div class="loket">
+<h3>LOKET 1</h3>
+<span id="loket1">-</span>
 </div>
+
+<div class="loket">
+<h3>LOKET 2</h3>
+<span id="loket2">-</span>
+</div>
+
+<div class="loket">
+<h3>LOKET 3</h3>
+<span id="loket3">-</span>
+</div>
+
+<div class="loket">
+<h3>LOKET 4</h3>
+<span id="loket4">-</span>
+</div>
+
+</div>
+
 
 <div class="running">
-  <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
+<div>
+Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil
+</div>
 </div>
 
-<!-- 🔥 FIREBASE + SUARA -->
-<script type="module">
-import { db } from "./firebase-config.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi",
+storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
+messagingSenderId: "807742809953",
+appId: "1:807742809953:web:afeb350b36f4731d36c720"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
 
 let audioAktif=false;
 let lastCalled={};
 
-window.aktifkanSuara=function(){
-  audioAktif=true;
-  speechSynthesis.speak(new SpeechSynthesisUtterance("Suara aktif"));
-  document.getElementById("unlock").style.display="none";
-};
 
+// AKTIFKAN AUDIO
+function aktifkanSuara(){
+
+audioAktif=true;
+
+speechSynthesis.cancel();
+
+speechSynthesis.speak(
+new SpeechSynthesisUtterance("Sistem suara aktif")
+);
+
+document.getElementById("unlock").style.display="none";
+
+}
+
+
+// SPEAK ENGINE
 function speak(text){
-  if(!audioAktif) return;
-  const msg=new SpeechSynthesisUtterance(text);
-  msg.lang="id-ID";
-  msg.rate=0.9;
-  speechSynthesis.speak(msg);
+
+if(!audioAktif) return;
+
+speechSynthesis.cancel();
+
+setTimeout(()=>{
+
+const msg=new SpeechSynthesisUtterance(text);
+
+msg.lang="id-ID";
+msg.rate=0.9;
+msg.pitch=1;
+
+speechSynthesis.speak(msg);
+
+},100);
+
 }
 
+
+// FORMAT SUARA
+function formatBaca(nomor,loket){
+
+const noBaca=nomor.replace(/^([A-Z])0+/,"$1 ");
+
+return "Nomor antrian "+
+noBaca.split("").join(" ")+
+" silakan menuju "+
+loket.replace("loket","loket ");
+
+}
+
+
+// LISTENER
 function listenLoket(id){
-  onValue(ref(db,"loket/"+id),(snap)=>{
-    const val=snap.val()||"-";
-    document.getElementById(id).innerText=val;
 
-    if(val.startsWith("A")) displayA.innerText=val;
-    if(val.startsWith("B")) displayB.innerText=val;
+db.ref("loket/"+id).on("value",(snap)=>{
 
-    if(val!=="-" && lastCalled[id]!==val){
-      speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
-      lastCalled[id]=val;
-    }
-  });
+const val=snap.val()||"-";
+
+document.getElementById(id).innerText=val;
+
+if(val.startsWith("A"))
+displayA.innerText=val;
+
+if(val.startsWith("B"))
+displayB.innerText=val;
+
+
+if(val!=="-" && lastCalled[id]!==val){
+
+speak(formatBaca(val,id));
+
+lastCalled[id]=val;
+
 }
+
+});
+
+}
+
 
 listenLoket("loket1");
 listenLoket("loket2");
 listenLoket("loket3");
 listenLoket("loket4");
+
 </script>
+
 
 <!-- JAM -->
 <script>
+
 function updateJam(){
-  const now=new Date();
-  const hari=now.toLocaleDateString("id-ID",{weekday:"long"});
-  const tanggal=now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
-  const jam=now.toLocaleTimeString("id-ID");
-  document.getElementById("jam").innerHTML=hari+", "+tanggal+"<br>Pukul "+jam;
+
+const now=new Date();
+
+const hari=now.toLocaleDateString("id-ID",{weekday:"long"});
+
+const tanggal=now.toLocaleDateString("id-ID",{
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+const jam=now.toLocaleTimeString("id-ID");
+
+document.getElementById("jam").innerHTML=
+hari+", "+tanggal+"<br>Pukul "+jam;
+
 }
+
 setInterval(updateJam,1000);
+
 updateJam();
+
 </script>
+
 
 </body>
 </html>
+
 
 
 
