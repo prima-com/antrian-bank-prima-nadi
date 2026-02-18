@@ -6,7 +6,6 @@
 <title>Dashboard Operator</title>
 
 <style>
-
 body{
 font-family:Arial;
 text-align:center;
@@ -43,107 +42,50 @@ margin:10px;
 font-size:32px;
 font-weight:bold;
 }
-
 </style>
-
 </head>
 <body>
-
 
 <h2>DASHBOARD OPERATOR</h2>
 
 
 <div class="box">
-
 <h3>Loket 1 (CS)</h3>
-
 <div id="loket1" class="nomor">-</div>
-
-<button class="panggil"
-onclick="panggil('cs','loket1','A')">
-PANGGIL
-</button>
-
-<button class="ulang"
-onclick="ulang('loket1')">
-ULANG
-</button>
-
+<button class="panggil" onclick="panggil('cs','loket1','A')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket1')">ULANG</button>
 </div>
 
 
-
 <div class="box">
-
 <h3>Loket 2 (TELLER)</h3>
-
 <div id="loket2" class="nomor">-</div>
-
-<button class="panggil"
-onclick="panggil('teller','loket2','B')">
-PANGGIL
-</button>
-
-<button class="ulang"
-onclick="ulang('loket2')">
-ULANG
-</button>
-
+<button class="panggil" onclick="panggil('teller','loket2','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket2')">ULANG</button>
 </div>
 
 
-
 <div class="box">
-
 <h3>Loket 3 (TELLER)</h3>
-
 <div id="loket3" class="nomor">-</div>
-
-<button class="panggil"
-onclick="panggil('teller','loket3','B')">
-PANGGIL
-</button>
-
-<button class="ulang"
-onclick="ulang('loket3')">
-ULANG
-</button>
-
+<button class="panggil" onclick="panggil('teller','loket3','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket3')">ULANG</button>
 </div>
-
 
 
 <div class="box">
-
 <h3>Loket 4 (TELLER)</h3>
-
 <div id="loket4" class="nomor">-</div>
-
-<button class="panggil"
-onclick="panggil('teller','loket4','B')">
-PANGGIL
-</button>
-
-<button class="ulang"
-onclick="ulang('loket4')">
-ULANG
-</button>
-
+<button class="panggil" onclick="panggil('teller','loket4','B')">PANGGIL</button>
+<button class="ulang" onclick="ulang('loket4')">ULANG</button>
 </div>
 
 
-
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-
 <script>
 
-
-// ==========================
-// CONFIG FIREBASE
-// ==========================
 const firebaseConfig = {
 
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
@@ -165,43 +107,28 @@ appId:
 
 };
 
-
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 
 
-
-// ==========================
-// UNLOCK AUDIO
-// ==========================
-document.body.addEventListener("click",function(){
-
+// unlock audio
+document.body.addEventListener("click",()=>{
 speechSynthesis.resume();
-
 });
 
 
-
-// ==========================
-// ENGINE SUARA STABIL
-// ==========================
-function speak(teks){
+// SPEAK
+function speak(text){
 
 speechSynthesis.cancel();
 
 setTimeout(()=>{
 
-const msg =
-new SpeechSynthesisUtterance(teks);
+const msg = new SpeechSynthesisUtterance(text);
 
 msg.lang="id-ID";
-
 msg.rate=0.9;
-
-msg.pitch=1;
-
-msg.volume=1;
 
 speechSynthesis.speak(msg);
 
@@ -210,10 +137,7 @@ speechSynthesis.speak(msg);
 }
 
 
-
-// ==========================
-// FORMAT SUARA
-// ==========================
+// FORMAT
 function panggilSuara(nomor,loket){
 
 const noBaca =
@@ -230,106 +154,87 @@ speak(teks);
 }
 
 
-
-// ==========================
-// PANGGIL NOMOR BARU
-// ==========================
+// PANGGIL
 function panggil(type,loket,kode){
 
-const ref =
-db.ref("antrian/"+type+"/current");
+const ref = db.ref("antrian/"+type+"/current");
 
+ref.once("value").then(snap=>{
 
-ref.once("value").then(snapshot=>{
-
-let nomor =
-snapshot.val() || 0;
+let nomor = snap.val() || 0;
 
 nomor++;
 
 ref.set(nomor);
 
-
 const tampil =
-kode +
-nomor.toString().padStart(3,"0");
+kode + nomor.toString().padStart(3,"0");
 
+db.ref("loket/"+loket).set({
 
-// kirim ke firebase
-db.ref("loket/"+loket).set(tampil);
+nomor: tampil,
+waktu: Date.now()
 
+});
 
-// bunyi di dashboard
 panggilSuara(tampil,loket);
-
 
 });
 
 }
 
 
-
-// ==========================
-// ULANG PANGGILAN
-// ==========================
+// ULANG
 function ulang(loket){
 
 db.ref("loket/"+loket).once("value")
-.then(snapshot=>{
+.then(snap=>{
 
-let nomor=snapshot.val();
+const data = snap.val();
 
-if(!nomor || nomor=="-"){
+if(!data || !data.nomor){
 
-alert("Belum ada nomor dipanggil");
+alert("Belum ada nomor");
 
 return;
 
 }
 
+db.ref("loket/"+loket).set({
 
-// trigger ulang agar TV bunyi
-db.ref("loket/"+loket).set(null);
+nomor: data.nomor,
+waktu: Date.now()
 
-setTimeout(()=>{
+});
 
-db.ref("loket/"+loket).set(nomor);
-
-},100);
-
-
-// bunyi dashboard
-panggilSuara(nomor,loket);
-
+panggilSuara(data.nomor,loket);
 
 });
 
 }
 
 
-
-// ==========================
-// LISTENER REALTIME DISPLAY
-// ==========================
+// realtime display
 ["loket1","loket2","loket3","loket4"]
 .forEach(id=>{
 
-db.ref("loket/"+id)
-.on("value",(snap)=>{
+db.ref("loket/"+id).on("value",snap=>{
 
-document.getElementById(id)
-.innerText=snap.val() || "-";
+const data = snap.val();
+
+document.getElementById(id).innerText =
+data ? data.nomor : "-";
 
 });
 
 });
-
 
 </script>
 
-
 </body>
 </html>
+
+
 
 
 
