@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Operator</title>
 
 <style>
@@ -48,7 +47,6 @@ button{padding:15px 25px;margin:8px;font-size:18px;border:none;border-radius:8px
 </div>
 
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
@@ -57,35 +55,20 @@ const firebaseConfig = {
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi",
-storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
-messagingSenderId: "807742809953",
-appId: "1:807742809953:web:afeb350b36f4731d36c720"
+projectId: "antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-
-// =======================
-// FUNGSI SUARA FIX
-// =======================
 function speak(teks){
-
-    speechSynthesis.cancel(); // reset suara lama
-
+    speechSynthesis.cancel();
     const msg = new SpeechSynthesisUtterance(teks);
     msg.lang = "id-ID";
     msg.rate = 0.9;
-    msg.pitch = 1;
-
     speechSynthesis.speak(msg);
 }
 
-
-// =======================
-// PANGGIL NOMOR
-// =======================
 function panggil(type,loket,kode){
 
     const ref = db.ref("antrian/"+type+"/current");
@@ -100,42 +83,35 @@ function panggil(type,loket,kode){
         const tampil = kode + nomor.toString().padStart(3,"0");
 
         db.ref("loket/"+loket).set(tampil);
-
-        const noBaca = tampil.replace(/^([A-Z])0+/, "$1 ");
-
-        speak("Nomor antrian " + noBaca.split("").join(" ") + 
-              " silakan menuju " + loket.replace("loket","loket "));
     });
 }
 
-
-// =======================
-// ULANG PANGGILAN
-// =======================
 function ulang(loket){
 
     db.ref("loket/"+loket).once("value").then(snapshot => {
 
         let nomor = snapshot.val();
-
         if(!nomor) return;
 
         const noBaca = nomor.replace(/^([A-Z])0+/, "$1 ");
 
-        speak("Nomor antrian " + noBaca.split("").join(" ") + 
+        speak("Nomor antrian " + noBaca.split("").join(" ") +
               " silakan menuju " + loket.replace("loket","loket "));
     });
 }
 
-
-// =======================
-// LISTENER REALTIME
-// =======================
 ["loket1","loket2","loket3","loket4"].forEach(id=>{
 
     db.ref("loket/"+id).on("value", snap => {
 
-        document.getElementById(id).innerText = snap.val() || "-";
+        let nomor = snap.val();
+        document.getElementById(id).innerText = nomor || "-";
+
+        if(nomor){
+            const noBaca = nomor.replace(/^([A-Z])0+/, "$1 ");
+            speak("Nomor antrian " + noBaca.split("").join(" ") +
+                  " silakan menuju " + id.replace("loket","loket "));
+        }
 
     });
 
@@ -144,6 +120,7 @@ function ulang(loket){
 
 </body>
 </html>
+
 
 
 
