@@ -253,33 +253,18 @@ Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggi
 
 <script>
 
-const firebaseConfig = {
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi",
-storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
-messagingSenderId: "807742809953",
-appId: "1:807742809953:web:afeb350b36f4731d36c720"
-};
-
-firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
 let audioAktif=false;
 let lastCalled={};
 
 
-// AKTIFKAN AUDIO
 function aktifkanSuara(){
 
 audioAktif=true;
 
-speechSynthesis.cancel();
-
 speechSynthesis.speak(
-new SpeechSynthesisUtterance("Sistem suara aktif")
+new SpeechSynthesisUtterance("Suara aktif")
 );
 
 document.getElementById("unlock").style.display="none";
@@ -287,7 +272,6 @@ document.getElementById("unlock").style.display="none";
 }
 
 
-// SPEAK ENGINE
 function speak(text){
 
 if(!audioAktif) return;
@@ -299,8 +283,6 @@ setTimeout(()=>{
 const msg=new SpeechSynthesisUtterance(text);
 
 msg.lang="id-ID";
-msg.rate=0.9;
-msg.pitch=1;
 
 speechSynthesis.speak(msg);
 
@@ -309,10 +291,10 @@ speechSynthesis.speak(msg);
 }
 
 
-// FORMAT SUARA
 function formatBaca(nomor,loket){
 
-const noBaca=nomor.replace(/^([A-Z])0+/,"$1 ");
+const noBaca=
+nomor.replace(/^([A-Z])0+/,"$1 ");
 
 return "Nomor antrian "+
 noBaca.split("").join(" ")+
@@ -322,27 +304,23 @@ loket.replace("loket","loket ");
 }
 
 
-// LISTENER
 function listenLoket(id){
 
-db.ref("loket/"+id).on("value",(snap)=>{
+db.ref("loket/"+id).on("value",snap=>{
 
-const val=snap.val()||"-";
+const data=snap.val();
 
-document.getElementById(id).innerText=val;
+if(!data) return;
 
-if(val.startsWith("A"))
-displayA.innerText=val;
+const nomor=data.nomor;
 
-if(val.startsWith("B"))
-displayB.innerText=val;
+document.getElementById(id).innerText=nomor;
 
+if(lastCalled[id]!==data.waktu){
 
-if(val!=="-" && lastCalled[id]!==val){
+speak(formatBaca(nomor,id));
 
-speak(formatBaca(val,id));
-
-lastCalled[id]=val;
+lastCalled[id]=data.waktu;
 
 }
 
@@ -357,6 +335,7 @@ listenLoket("loket3");
 listenLoket("loket4");
 
 </script>
+
 
 
 <!-- JAM -->
@@ -390,6 +369,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
