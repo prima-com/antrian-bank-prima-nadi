@@ -148,51 +148,45 @@ databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.fireba
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let audioAktif=false;
-let lastCalled={};
+let suaraAktif=false;
+let last={};
 
-/* AKTIFKAN SUARA */
-function aktifkanSuara(){
-audioAktif=true;
-speechSynthesis.speak(new SpeechSynthesisUtterance("Suara aktif"));
-document.getElementById("unlock").style.display="none";
+/* UNLOCK AUDIO */
+document.body.addEventListener("click",()=>{
+if(!suaraAktif){
+suaraAktif=true;
+speechSynthesis.speak(new SpeechSynthesisUtterance("Suara sistem aktif"));
 }
+});
 
-/* SPEAK */
-function speak(text){
-if(!audioAktif) return;
+/* SPEAK FUNCTION */
+function speak(txt){
+if(!suaraAktif) return;
 speechSynthesis.cancel();
-const msg=new SpeechSynthesisUtterance(text);
+const msg=new SpeechSynthesisUtterance(txt);
 msg.lang="id-ID";
 msg.rate=0.9;
 speechSynthesis.speak(msg);
 }
 
-/* LISTENER REALTIME */
-function listenLoket(id){
+/* REALTIME LISTENER */
+["loket1","loket2","loket3","loket4"].forEach(id=>{
 db.ref("loket/"+id).on("value",snap=>{
+let val=snap.val()||"-";
 
-const val=snap.val()||"-";
 document.getElementById(id).innerText=val;
 
-/* update panel besar */
 if(val.startsWith("A")) displayA.innerText=val;
 if(val.startsWith("B")) displayB.innerText=val;
 
-/* suara */
-if(val!=="-" && lastCalled[id]!==val){
+if(val!=="-" && last[id]!==val){
 speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
-lastCalled[id]=val;
+last[id]=val;
 }
-
 });
-}
-
-listenLoket("loket1");
-listenLoket("loket2");
-listenLoket("loket3");
-listenLoket("loket4");
+});
 </script>
+
 
 <!-- JAM -->
 <script>
@@ -209,6 +203,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
