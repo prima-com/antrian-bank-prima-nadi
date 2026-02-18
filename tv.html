@@ -151,13 +151,25 @@ window.aktifkanSuara=function(){
 
 function speak(text){
   if(!audioAktif) return;
+
+  speechSynthesis.cancel(); // stop suara lama
+
   const msg=new SpeechSynthesisUtterance(text);
   msg.lang="id-ID";
   msg.rate=0.9;
   speechSynthesis.speak(msg);
 }
 
+function panggilSuara(loket, nomor){
+  speak("Nomor antrian " + nomor + " silakan menuju " + loket);
+}
+
+/* =========================
+   LISTEN NOMOR DIPANGGIL
+========================= */
 function listenLoket(id){
+
+  // realtime nomor baru
   onValue(ref(db,"loket/"+id),(snap)=>{
     const val=snap.val()||"-";
     document.getElementById(id).innerText=val;
@@ -166,17 +178,30 @@ function listenLoket(id){
     if(val.startsWith("B")) displayB.innerText=val;
 
     if(val!=="-" && lastCalled[id]!==val){
-      speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
+      panggilSuara(id.replace("loket","Loket "), val);
       lastCalled[id]=val;
     }
   });
+
+  /* =========================
+     LISTEN TOMBOL ULANG
+  ========================= */
+  onValue(ref(db,"ulang/"+id),(snap)=>{
+    const nomor=snap.val();
+    if(nomor){
+      panggilSuara(id.replace("loket","Loket "), nomor);
+    }
+  });
+
 }
 
 listenLoket("loket1");
 listenLoket("loket2");
 listenLoket("loket3");
 listenLoket("loket4");
+
 </script>
+
 
 <!-- JAM -->
 <script>
@@ -193,6 +218,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
