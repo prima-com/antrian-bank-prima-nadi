@@ -135,41 +135,57 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
   <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
 </div>
 
-<!-- 🔥 FIREBASE + SUARA -->
-<script type="module">
-import { db } from "./firebase-config.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+<!-- FIREBASE COMPAT -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
 let audioAktif=false;
 let lastCalled={};
 
-window.aktifkanSuara=function(){
-  audioAktif=true;
-  speechSynthesis.speak(new SpeechSynthesisUtterance("Suara aktif"));
-  document.getElementById("unlock").style.display="none";
-};
-
-function speak(text){
-  if(!audioAktif) return;
-  const msg=new SpeechSynthesisUtterance(text);
-  msg.lang="id-ID";
-  msg.rate=0.9;
-  speechSynthesis.speak(msg);
+/* AKTIFKAN SUARA */
+function aktifkanSuara(){
+audioAktif=true;
+speechSynthesis.speak(new SpeechSynthesisUtterance("Suara aktif"));
+document.getElementById("unlock").style.display="none";
 }
 
+/* SPEAK */
+function speak(text){
+if(!audioAktif) return;
+speechSynthesis.cancel();
+const msg=new SpeechSynthesisUtterance(text);
+msg.lang="id-ID";
+msg.rate=0.9;
+speechSynthesis.speak(msg);
+}
+
+/* LISTENER REALTIME */
 function listenLoket(id){
-  onValue(ref(db,"loket/"+id),(snap)=>{
-    const val=snap.val()||"-";
-    document.getElementById(id).innerText=val;
+db.ref("loket/"+id).on("value",snap=>{
 
-    if(val.startsWith("A")) displayA.innerText=val;
-    if(val.startsWith("B")) displayB.innerText=val;
+const val=snap.val()||"-";
+document.getElementById(id).innerText=val;
 
-    if(val!=="-" && lastCalled[id]!==val){
-      speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
-      lastCalled[id]=val;
-    }
-  });
+/* update panel besar */
+if(val.startsWith("A")) displayA.innerText=val;
+if(val.startsWith("B")) displayB.innerText=val;
+
+/* suara */
+if(val!=="-" && lastCalled[id]!==val){
+speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
+lastCalled[id]=val;
+}
+
+});
 }
 
 listenLoket("loket1");
@@ -193,6 +209,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
