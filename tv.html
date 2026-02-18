@@ -135,59 +135,6 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
   <div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil • Terima kasih</div>
 </div>
 
-<!-- FIREBASE COMPAT -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig={
-apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-
-let suaraAktif=false;
-let last={};
-
-/* UNLOCK AUDIO */
-document.body.addEventListener("click",()=>{
-if(!suaraAktif){
-suaraAktif=true;
-speechSynthesis.speak(new SpeechSynthesisUtterance("Suara sistem aktif"));
-}
-});
-
-/* SPEAK FUNCTION */
-function speak(txt){
-if(!suaraAktif) return;
-speechSynthesis.cancel();
-const msg=new SpeechSynthesisUtterance(txt);
-msg.lang="id-ID";
-msg.rate=0.9;
-speechSynthesis.speak(msg);
-}
-
-/* REALTIME LISTENER */
-["loket1","loket2","loket3","loket4"].forEach(id=>{
-db.ref("loket/"+id).on("value",snap=>{
-let val=snap.val()||"-";
-
-document.getElementById(id).innerText=val;
-
-if(val.startsWith("A")) displayA.innerText=val;
-if(val.startsWith("B")) displayB.innerText=val;
-
-if(val!=="-" && last[id]!==val){
-speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
-last[id]=val;
-}
-});
-});
-</script>
-
-
 <!-- JAM -->
 <script>
 function updateJam(){
@@ -201,8 +148,63 @@ setInterval(updateJam,1000);
 updateJam();
 </script>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let audioReady=false;
+let lastCall={};
+
+/* unlock suara */
+document.addEventListener("click",()=>{
+if(!audioReady){
+audioReady=true;
+speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
+}
+});
+
+/* fungsi suara */
+function speak(text){
+if(!audioReady) return;
+speechSynthesis.cancel();
+let msg=new SpeechSynthesisUtterance(text);
+msg.lang="id-ID";
+speechSynthesis.speak(msg);
+}
+
+/* realtime listener */
+["loket1","loket2","loket3","loket4"].forEach(id=>{
+db.ref("loket/"+id).on("value",snap=>{
+let val=snap.val()||"-";
+
+document.getElementById(id).innerText=val;
+
+if(val.startsWith("A")) document.querySelectorAll(".nomor")[0].innerText=val;
+if(val.startsWith("B")) document.querySelectorAll(".nomor")[1].innerText=val;
+
+if(val!=="-" && lastCall[id]!==val){
+speak("Nomor "+val+" silakan menuju "+id.replace("loket","loket "));
+lastCall[id]=val;
+}
+});
+});
+</script>
+
+
+
+
+  
 </body>
 </html>
+
 
 
 
