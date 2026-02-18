@@ -81,7 +81,13 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 </head>
 
 <body>
-
+<button onclick="aktifkanSuara()" 
+style="position:fixed;top:10px;right:10px;z-index:9999;
+background:#ff9800;border:none;padding:10px 14px;
+border-radius:6px;font-weight:bold;">
+🔊 AKTIFKAN SUARA
+</button>
+  
 <!-- 🔊 UNLOCK AUDIO -->
 <div id="unlock">
   <button onclick="aktifkanSuara()" style="
@@ -216,8 +222,70 @@ setInterval(updateJam,1000);
 updateJam();
 </script>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+/* CONFIG FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "antrian-bank-prima-nadi"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* AKTIVASI SUARA */
+let suaraAktif = false;
+
+function aktifkanSuara(){
+  suaraAktif = true;
+  alert("Suara sudah aktif ✔");
+}
+
+/* TEXT TO SPEECH */
+function speak(teks){
+  if(!suaraAktif) return;
+
+  speechSynthesis.cancel();
+
+  const msg = new SpeechSynthesisUtterance(teks);
+  msg.lang = "id-ID";
+  msg.rate = 0.9;
+  speechSynthesis.speak(msg);
+}
+
+/* LISTENER REALTIME */
+["loket1","loket2","loket3","loket4"].forEach(id=>{
+
+  db.ref("loket/"+id).on("value", snap=>{
+
+    const nomor = snap.val();
+    if(!nomor) return;
+
+    const huruf = nomor.charAt(0);
+    const angka = nomor.slice(1);
+
+    speak("Nomor antrian " + huruf + " " + angka +
+          " silakan menuju " + id.replace("loket","loket "));
+  });
+
+});
+</script>
+
+
+
+
+
+
+
+  
 </body>
 </html>
+
 
 
 
