@@ -2,10 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Display Antrian Bank</title>
+<title>Display Antrian Bank Prima Nadi</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial;
@@ -13,8 +12,7 @@ background:#0b2d57;
 color:white;
 }
 
-/* ================= HEADER ================= */
-
+/* HEADER */
 .header{
 height:70px;
 background:#1d4c84;
@@ -31,8 +29,7 @@ letter-spacing:2px;
 color:#FFD700;
 }
 
-/* ================= MAIN CONTAINER ================= */
-
+/* MAIN */
 .container{
 display:flex;
 height:62vh;
@@ -73,8 +70,7 @@ text-shadow:
 0 0 20px rgba(255,215,0,0.7);
 }
 
-/* ================= TV ================= */
-
+/* TV */
 .tv{
 width:45%;
 border-radius:15px;
@@ -87,8 +83,7 @@ height:100%;
 border:none;
 }
 
-/* ================= PROMO ================= */
-
+/* PROMO */
 .promo{
 width:27%;
 background:#163d6b;
@@ -96,8 +91,7 @@ border-radius:15px;
 padding:15px;
 }
 
-/* ================= MINI LOKET PREMIUM ================= */
-
+/* MINI LOKET PREMIUM */
 .mini{
 display:flex;
 gap:12px;
@@ -140,12 +134,36 @@ text-shadow:
 0 0 20px rgba(255,215,0,0.7);
 }
 
-/* ================= RUNNING TEXT ================= */
+/* LOKET AKTIF */
+.active-loket{
+animation:pulse 1.2s ease-in-out 3;
+border:2px solid #FFD700;
+box-shadow:
+0 0 10px #FFD700,
+0 0 20px rgba(255,215,0,0.8);
+}
 
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+
+.blink{
+animation:blinkAnim 0.6s ease-in-out 3;
+}
+
+@keyframes blinkAnim{
+0%{opacity:1;}
+50%{opacity:0.3;}
+100%{opacity:1;}
+}
+
+/* RUNNING TEXT */
 .running{
 background:#0a2445;
 color:yellow;
-font-size:18px;
+font-size:22px;
 padding:10px;
 white-space:nowrap;
 overflow:hidden;
@@ -162,8 +180,7 @@ animation:jalan 20s linear infinite;
 100%{transform:translateX(-100%);}
 }
 
-/* ================= UNLOCK AUDIO ================= */
-
+/* AUDIO UNLOCK */
 #unlock{
 position:fixed;
 top:0;
@@ -176,13 +193,11 @@ align-items:center;
 justify-content:center;
 z-index:9999;
 }
-
 </style>
 </head>
 
 <body>
 
-<!-- UNLOCK AUDIO -->
 <div id="unlock">
 <button onclick="aktifkanSuara()" style="
 font-size:30px;
@@ -204,25 +219,10 @@ cursor:pointer;
 <div class="container">
 
 <div class="left">
-
-<div class="box small">
-<div class="title">LOKET A</div>
-</div>
-
-<div class="box big">
-<div class="title">NOMOR ANTRIAN</div>
-<div class="nomor" id="displayA">-</div>
-</div>
-
-<div class="box small">
-<div class="title">LOKET B</div>
-</div>
-
-<div class="box big">
-<div class="title">NOMOR ANTRIAN</div>
-<div class="nomor" id="displayB">-</div>
-</div>
-
+<div class="box small"><div class="title">LOKET A</div></div>
+<div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayA">-</div></div>
+<div class="box small"><div class="title">LOKET B</div></div>
+<div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayB">-</div></div>
 </div>
 
 <div class="tv">
@@ -246,17 +246,13 @@ cursor:pointer;
 </div>
 
 <div class="running">
-<div>
-Selamat datang di Bank Prima Nadi Kantor Cabang Utama• Mohon menunggu nomor antrian Anda dipanggil. Terima kasih
-</div>
+<div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil</div>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-
 const firebaseConfig = {
 apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
@@ -298,11 +294,25 @@ function listenLoket(id){
 db.ref("loket/"+id).on("value",(snap)=>{
 const data=snap.val();
 if(!data) return;
+
 const nomor=data.nomor;
+const loketBox=document.getElementById(id).parentElement;
+
 document.getElementById(id).innerText=nomor;
+
 if(nomor.startsWith("A")) displayA.innerText=nomor;
 if(nomor.startsWith("B")) displayB.innerText=nomor;
+
 if(lastCalled[id]!==data.waktu){
+
+loketBox.classList.add("active-loket");
+document.getElementById(id).classList.add("blink");
+
+setTimeout(()=>{
+loketBox.classList.remove("active-loket");
+document.getElementById(id).classList.remove("blink");
+},2500);
+
 speak(formatBaca(nomor,id));
 lastCalled[id]=data.waktu;
 }
@@ -314,9 +324,6 @@ listenLoket("loket2");
 listenLoket("loket3");
 listenLoket("loket4");
 
-</script>
-
-<script>
 function updateJam(){
 const now=new Date();
 const hari=now.toLocaleDateString("id-ID",{weekday:"long"});
@@ -324,6 +331,7 @@ const tanggal=now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"n
 const jam=now.toLocaleTimeString("id-ID");
 document.getElementById("jam").innerHTML=hari+", "+tanggal+"<br>Pukul "+jam;
 }
+
 setInterval(updateJam,1000);
 updateJam();
 </script>
