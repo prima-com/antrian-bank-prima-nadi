@@ -116,15 +116,10 @@ border:1px solid #ffffff22;
 text-align:center;
 }
 
-.promo tr:nth-child(even){
-background:#1b4475;
-}
+.promo tr:nth-child(even){background:#1b4475;}
+.promo tr:nth-child(odd){background:#163d6b;}
 
-.promo tr:nth-child(odd){
-background:#163d6b;
-}
-
-/* HIGHLIGHT RATE TERTINGGI */
+/* Highlight rate tertinggi */
 .highlight-rate{
 color:#FFD700;
 font-weight:bold;
@@ -353,6 +348,14 @@ const nomor=data.nomor;
 const loketBox=document.getElementById(id).parentElement;
 
 document.getElementById(id).innerText=nomor;
+
+// 🔥 FIX AGAR PANEL KIRI MUNCUL
+if(nomor.startsWith("A")){
+document.getElementById("displayA").innerText = nomor;
+}
+if(nomor.startsWith("B")){
+document.getElementById("displayB").innerText = nomor;
+}
 
 if(lastCalled[id]!==data.waktu){
 
