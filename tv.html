@@ -65,9 +65,7 @@ font-weight:bold;
 font-size:80px;
 font-weight:bold;
 color:gold;
-text-shadow:
-0 0 10px #FFD700,
-0 0 20px rgba(255,215,0,0.7);
+text-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.7);
 }
 
 /* TV */
@@ -79,7 +77,7 @@ overflow:hidden;
 
 .tv iframe{
 width:100%;
-height:90%;
+height:100%;
 border:none;
 }
 
@@ -91,7 +89,59 @@ border-radius:15px;
 padding:15px;
 }
 
-/* MINI LOKET PREMIUM */
+/* TABEL DEPOSITO */
+.promo h2{
+text-align:center;
+color:#FFD700;
+letter-spacing:1px;
+margin-bottom:15px;
+}
+
+.promo table{
+width:100%;
+border-collapse:collapse;
+font-size:16px;
+}
+
+.promo th{
+background:#1d4c84;
+color:#FFD700;
+padding:10px;
+border:1px solid #ffffff33;
+}
+
+.promo td{
+padding:10px;
+border:1px solid #ffffff22;
+text-align:center;
+}
+
+.promo tr:nth-child(even){
+background:#1b4475;
+}
+
+.promo tr:nth-child(odd){
+background:#163d6b;
+}
+
+/* HIGHLIGHT RATE TERTINGGI */
+.highlight-rate{
+color:#FFD700;
+font-weight:bold;
+text-shadow:
+0 0 5px #FFD700,
+0 0 10px #FFD700,
+0 0 20px rgba(255,215,0,0.8);
+animation:goldPulse 2s infinite;
+}
+
+@keyframes goldPulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+
+/* MINI LOKET */
 .mini{
 display:flex;
 gap:12px;
@@ -111,8 +161,7 @@ text-align:center;
 display:flex;
 flex-direction:column;
 justify-content:center;
-box-shadow:
-inset 0 2px 4px rgba(255,255,255,0.1),
+box-shadow:inset 0 2px 4px rgba(255,255,255,0.1),
 0 3px 8px rgba(0,0,0,0.5);
 }
 
@@ -128,19 +177,14 @@ color:#cfd8ff;
 font-size:24px;
 color:#FFD700;
 font-weight:bold;
-text-shadow:
-0 0 5px #FFD700,
-0 0 10px #FFD700,
-0 0 20px rgba(255,215,0,0.7);
+text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
 }
 
 /* LOKET AKTIF */
 .active-loket{
 animation:pulse 1.2s ease-in-out 3;
 border:2px solid #FFD700;
-box-shadow:
-0 0 10px #FFD700,
-0 0 20px rgba(255,215,0,0.8);
+box-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
 }
 
 @keyframes pulse{
@@ -205,8 +249,7 @@ padding:20px 40px;
 background:gold;
 border:none;
 border-radius:15px;
-cursor:pointer;
-">
+cursor:pointer;">
 🔊 AKTIFKAN SUARA
 </button>
 </div>
@@ -230,51 +273,24 @@ cursor:pointer;
 </div>
 
 <div class="promo">
-<h2 style="text-align:center;">PROMO DEPOSITO</h2>
-
-<table style="
-width:100%;
-border-collapse:collapse;
-margin-top:15px;
-font-size:18px;
-">
-
-<tr style="background:#1d4c84;color:#FFD700;font-weight:bold;">
-<td style="padding:10px;border:1px solid #ffffff55;">
-NOMINAL DEPOSITO
-</td>
-<td style="padding:10px;border:1px solid #ffffff55;text-align:center;">
-RATE
-</td>
-</tr>
-
+<h2>DEPOSITO BERJANGKA</h2>
+<table>
 <tr>
-<td style="padding:10px;border:1px solid #ffffff33;">
-10.000.000 - 100.000.000,-
-</td>
-<td style="padding:10px;border:1px solid #ffffff33;text-align:center;">
-5,00 %
-</td>
+<th>NOMINAL DEPOSITO</th>
+<th>RATE</th>
 </tr>
-
 <tr>
-<td style="padding:10px;border:1px solid #ffffff33;">
-100.000.001 - 200.000.000,-
-</td>
-<td style="padding:10px;border:1px solid #ffffff33;text-align:center;">
-5,25 %
-</td>
+<td>10.000.000 - 100.000.000,-</td>
+<td>5,00 %</td>
 </tr>
-
 <tr>
-<td style="padding:10px;border:1px solid #ffffff33;">
-200.000.001 - 500.000.000,-
-</td>
-<td style="padding:10px;border:1px solid #ffffff33;text-align:center;">
-5,50 %
-</td>
+<td>100.000.001 - 200.000.000,-</td>
+<td>5,25 %</td>
 </tr>
-
+<tr>
+<td>200.000.001 - 500.000.000,-</td>
+<td class="highlight-rate">5,50 %</td>
+</tr>
 </table>
 </div>
 
@@ -299,10 +315,7 @@ const firebaseConfig = {
 apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"antrian-bank-prima-nadi",
-storageBucket:"antrian-bank-prima-nadi.firebasestorage.app",
-messagingSenderId:"807742809953",
-appId:"1:807742809953:web:afeb350b36f4731d36c720"
+projectId:"antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -328,8 +341,7 @@ speechSynthesis.speak(msg);
 }
 
 function formatBaca(nomor,loket){
-const noBaca=nomor.replace(/^([A-Z])0+/,"$1 ");
-return "Nomor antrian "+noBaca.split("").join(" ")+" silakan menuju "+loket.replace("loket","loket ");
+return "Nomor antrian "+nomor+" silakan menuju "+loket.replace("loket","loket ");
 }
 
 function listenLoket(id){
@@ -341,9 +353,6 @@ const nomor=data.nomor;
 const loketBox=document.getElementById(id).parentElement;
 
 document.getElementById(id).innerText=nomor;
-
-if(nomor.startsWith("A")) displayA.innerText=nomor;
-if(nomor.startsWith("B")) displayB.innerText=nomor;
 
 if(lastCalled[id]!==data.waktu){
 
@@ -368,18 +377,17 @@ listenLoket("loket4");
 
 function updateJam(){
 const now=new Date();
-const hari=now.toLocaleDateString("id-ID",{weekday:"long"});
-const tanggal=now.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
-const jam=now.toLocaleTimeString("id-ID");
-document.getElementById("jam").innerHTML=hari+", "+tanggal+"<br>Pukul "+jam;
+document.getElementById("jam").innerHTML=
+now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+
+"<br>Pukul "+now.toLocaleTimeString("id-ID");
 }
-
 setInterval(updateJam,1000);
 updateJam();
 </script>
 
 </body>
 </html>
+
 
 
 
