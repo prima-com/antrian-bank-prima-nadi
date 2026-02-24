@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator</title>
+<title>Dashboard Operator Enterprise</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -17,8 +17,6 @@ margin:0;
 padding:20px;
 }
 
-h1{margin-bottom:20px;}
-
 button{
 padding:12px 20px;
 margin:5px;
@@ -31,23 +29,43 @@ font-weight:bold;
 }
 
 button:hover{opacity:0.8;}
-.panel{margin-top:20px;}
+
+.loginBox{
+position:fixed;
+inset:0;
+background:#0e2f5a;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.loginContent{
+background:white;
+padding:30px;
+border-radius:10px;
+width:300px;
+text-align:center;
+color:black;
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox" style="position:fixed;inset:0;background:#0e2f5a;display:flex;justify-content:center;align-items:center;z-index:9999;">
-  <div style="background:white;padding:30px;border-radius:10px;width:300px;text-align:center;color:black;">
-    <h3>Login Operator</h3>
-    <input type="password" id="password" placeholder="Masukkan Password" style="width:100%;padding:10px;margin-bottom:10px;">
-    <button onclick="login()">Masuk</button>
-  </div>
+<div class="loginBox" id="loginBox">
+<div class="loginContent">
+<h3>Login Operator</h3>
+<input type="text" id="username" placeholder="Username" style="width:100%;padding:10px;margin-bottom:10px;">
+<input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px;">
+<button onclick="login()">Masuk</button>
+</div>
 </div>
 
 <h1>DASHBOARD OPERATOR</h1>
 
-<div class="panel">
+<div id="operatorInfo"></div>
+
+<div>
 <button onclick="panggil('loket1')">Panggil Loket 1</button>
 <button onclick="ulang('loket1')">Ulang Loket 1</button><br>
 
@@ -63,11 +81,8 @@ button:hover{opacity:0.8;}
 
 <script>
 
-// ================= FIREBASE SAFE INIT =================
-let db=null;
-
-try{
-var firebaseConfig={
+// ================== FIREBASE CONFIG ==================
+var firebaseConfig = {
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:
@@ -79,40 +94,39 @@ messagingSenderId: "807742809953",
 appId:
 "1:807742809953:web:afeb350b36f4731d36c720"
 };
-
-if(firebaseConfig.apiKey!=="ISI_API_KEY"){
 firebase.initializeApp(firebaseConfig);
-db=firebase.database();
-}
-}catch(e){
-console.log("Firebase belum dikonfigurasi");
-}
+var db = firebase.database();
 
-// ================= ROLE SYSTEM =================
+// ================== GLOBAL ==================
 let role=null;
 let prefix="";
 let allowedLoket=[];
-let counter=1;
 let lastNomor={};
 
-// ================= LOGIN =================
+// ================== LOGIN ==================
 function login(){
-const pass=document.getElementById("password").value.trim();
+const username=document.getElementById("username").value;
+const password=document.getElementById("password").value;
 
-if(pass==="cs123"){
-role="cs";
-}else if(pass==="teller123"){
-role="teller";
-}else{
-alert("Password salah!");
+db.ref("users/"+username).once("value",snap=>{
+if(!snap.exists()){
+alert("User tidak ditemukan");
 return;
 }
 
-document.getElementById("loginBox").style.display="none";
-initRole();
+const data=snap.val();
+if(data.password!==password){
+alert("Password salah");
+return;
 }
 
-// ================= INIT ROLE =================
+role=data.role;
+document.getElementById("loginBox").style.display="none";
+initRole();
+});
+}
+
+// ================== INIT ROLE ==================
 function initRole(){
 if(role==="cs"){
 prefix="A";
@@ -122,11 +136,14 @@ prefix="B";
 allowedLoket=["loket3","loket4"];
 }
 
+document.getElementById("operatorInfo").innerHTML=
+"<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
+
 hideUnauthorized();
-resetIfNewDay();
+checkResetServer();
 }
 
-// ================= BATASI LOKET =================
+// ================== BATASI LOKET ==================
 function hideUnauthorized(){
 document.querySelectorAll("button").forEach(btn=>{
 const oc=btn.getAttribute("onclick");
@@ -141,64 +158,63 @@ btn.style.display="none";
 });
 }
 
-// ================= RESET HARIAN =================
-function resetIfNewDay(){
+// ================== RESET OTOMATIS SERVER ==================
+function checkResetServer(){
 const today=new Date().toISOString().slice(0,10);
-const lastDate=localStorage.getItem("lastDate");
 
-if(lastDate!==today){
-localStorage.setItem("counterA",1);
-localStorage.setItem("counterB",1);
-localStorage.setItem("lastDate",today);
+db.ref("config/lastReset").once("value",snap=>{
+const lastReset=snap.val();
+
+if(lastReset!==today){
+db.ref("counter").set({A:1,B:1});
+db.ref("config/lastReset").set(today);
+}
+});
 }
 
-counter=parseInt(localStorage.getItem("counter"+prefix))||1;
+// ================== GENERATE NOMOR ==================
+function generateNomor(callback){
+db.ref("counter/"+prefix).transaction(current=>{
+if(current===null) return 1;
+return current+1;
+},function(error,committed,snapshot){
+if(committed){
+const nomor=prefix+String(snapshot.val()-1).padStart(3,"0");
+callback(nomor);
+}
+});
 }
 
-// ================= GENERATE NOMOR =================
-function generateNomor(){
-const nomor=prefix+String(counter).padStart(3,"0");
-localStorage.setItem("counter"+prefix,counter+1);
-counter++;
-return nomor;
-}
-
-// ================= PANGGIL =================
+// ================== PANGGIL ==================
 function panggil(loket){
 if(!allowedLoket.includes(loket)) return;
 
-const nomor=generateNomor();
+generateNomor(function(nomor){
 lastNomor[loket]=nomor;
 
-if(db){
 db.ref("loket/"+loket).set({
 nomor:nomor,
 waktu:Date.now()
 });
+});
 }
 
-console.log("Panggil:",nomor,"ke",loket);
-}
-
-// ================= ULANG =================
+// ================== ULANG ==================
 function ulang(loket){
 if(!allowedLoket.includes(loket)) return;
 if(!lastNomor[loket]) return;
 
-if(db){
 db.ref("loket/"+loket).set({
 nomor:lastNomor[loket],
 waktu:Date.now()
 });
 }
 
-console.log("Ulang:",lastNomor[loket]);
-}
-
 </script>
 
 </body>
 </html>
+
 
 
 
