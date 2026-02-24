@@ -5,6 +5,7 @@
 <title>Display Antrian Bank Prima Nadi</title>
 
 <style>
+
 body{
 margin:0;
 font-family:Arial;
@@ -13,6 +14,7 @@ color:white;
 }
 
 /* HEADER */
+
 .header{
 height:70px;
 background:#1d4c84;
@@ -30,12 +32,15 @@ color:#FFD700;
 }
 
 /* MAIN */
+
 .container{
 display:flex;
-height:58vh; /* sedikit diperkecil supaya ada ruang LPS */
+height:62vh;
 padding:15px;
 gap:15px;
 }
+
+/* LEFT */
 
 .left{
 width:28%;
@@ -69,8 +74,15 @@ text-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.7);
 }
 
 /* TV */
-.tv{
+
+.tv-wrapper{
 width:45%;
+display:flex;
+flex-direction:column;
+}
+
+.tv{
+height:90%;
 border-radius:15px;
 overflow:hidden;
 }
@@ -81,7 +93,23 @@ height:100%;
 border:none;
 }
 
+/* LPS */
+
+.lps{
+height:10%;
+background:#0e2f5a;
+border-top:2px solid gold;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+letter-spacing:1px;
+color:#FFD700;
+font-size:14px;
+}
+
 /* PROMO */
+
 .promo{
 width:27%;
 background:#163d6b;
@@ -89,7 +117,6 @@ border-radius:15px;
 padding:15px;
 }
 
-/* TABEL DEPOSITO */
 .promo table{
 width:100%;
 border-collapse:collapse;
@@ -115,20 +142,10 @@ text-align:center;
 .highlight-rate{
 color:#FFD700;
 font-weight:bold;
-text-shadow:
-0 0 5px #FFD700,
-0 0 10px #FFD700,
-0 0 20px rgba(255,215,0,0.8);
-animation:goldPulse 2s infinite;
-}
-
-@keyframes goldPulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.08);}
-100%{transform:scale(1);}
 }
 
 /* MINI LOKET */
+
 .mini{
 display:flex;
 gap:12px;
@@ -136,60 +153,21 @@ padding:6px 20px;
 height:60px;
 align-items:center;
 background:#0e2f5a;
-box-shadow:0 -3px 10px rgba(0,0,0,0.4);
 }
 
 .loket{
 flex:1;
-background:linear-gradient(145deg,#163d6b,#0f2f55);
-border-radius:25px;
-padding:5px 10px;
 text-align:center;
-display:flex;
-flex-direction:column;
-justify-content:center;
-box-shadow:inset 0 2px 4px rgba(255,255,255,0.1),
-0 3px 8px rgba(0,0,0,0.5);
-}
-
-.loket h3{
-margin:0;
-font-size:14px;
-font-weight:600;
-letter-spacing:1px;
-color:#cfd8ff;
 }
 
 .loket span{
 font-size:24px;
 color:#FFD700;
 font-weight:bold;
-text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
-}
-
-.active-loket{
-animation:pulse 1.2s ease-in-out 3;
-border:2px solid #FFD700;
-box-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
-}
-
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
-}
-
-.blink{
-animation:blinkAnim 0.6s ease-in-out 3;
-}
-
-@keyframes blinkAnim{
-0%{opacity:1;}
-50%{opacity:0.3;}
-100%{opacity:1;}
 }
 
 /* RUNNING TEXT */
+
 .running{
 background:#0a2445;
 color:yellow;
@@ -210,18 +188,8 @@ animation:jalan 20s linear infinite;
 100%{transform:translateX(-100%);}
 }
 
-/* LPS */
-.lps{
-background:#0e2f5a;
-color:#FFD700;
-text-align:center;
-padding:8px;
-font-weight:bold;
-letter-spacing:1px;
-border-top:2px solid gold;
-}
-
 /* AUDIO UNLOCK */
+
 #unlock{
 position:fixed;
 top:0;
@@ -234,6 +202,7 @@ align-items:center;
 justify-content:center;
 z-index:9999;
 }
+
 </style>
 </head>
 
@@ -252,149 +221,118 @@ cursor:pointer;">
 </div>
 
 <div class="header">
+
 <img src="logo_pn.png" height="100%">
+
 <div id="jam" class="led"></div>
+
 </div>
 
 <div class="container">
 
+<!-- LEFT -->
+
 <div class="left">
-<div class="box small"><div class="title">LOKET A</div></div>
-<div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayA">-</div></div>
-<div class="box small"><div class="title">LOKET B</div></div>
-<div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayB">-</div></div>
+
+<div class="box small">
+<div class="title">LOKET A</div>
 </div>
+
+<div class="box big">
+<div class="title">NOMOR ANTRIAN</div>
+<div class="nomor" id="displayA">-</div>
+</div>
+
+<div class="box small">
+<div class="title">LOKET B</div>
+</div>
+
+<div class="box big">
+<div class="title">NOMOR ANTRIAN</div>
+<div class="nomor" id="displayB">-</div>
+</div>
+
+</div>
+
+<!-- TV + LPS -->
+
+<div class="tv-wrapper">
 
 <div class="tv">
 <iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
 </div>
 
-<div class="promo">
-<table>
-<tr>
-<th>NOMINAL DEPOSITO</th>
-<th>RATE</th>
-</tr>
-<tr>
-<td>1 jt - ≤ 100 jt </td>
-<td>5,00 %</td>
-</tr>
-<tr>
-<td>100 jt keatas - < 500 jt</td>
-<td>5,25 %</td>
-</tr>
-<tr>
-<td> 500 jt keatas</td>
-<td class="highlight-rate">5,50 %</td>
-</tr>
-</table>
-</div>
-
-</div>
-
-<!-- TEXT LPS -->
 <div class="lps">
 TABUNGAN NASABAH DIJAMIN OLEH LEMBAGA PENJAMIN SIMPANAN (LPS)
 </div>
 
+</div>
+
+<!-- PROMO -->
+
+<div class="promo">
+
+<table>
+
+<tr>
+<th>NOMINAL DEPOSITO</th>
+<th>RATE</th>
+</tr>
+
+<tr>
+<td>10.000.000 - 100.000.000</td>
+<td>5,00 %</td>
+</tr>
+
+<tr>
+<td>100.000.001 - 200.000.000</td>
+<td>5,25 %</td>
+</tr>
+
+<tr>
+<td>200.000.001 - 500.000.000</td>
+<td class="highlight-rate">5,50 %</td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
 <div class="mini">
-<div class="loket"><h3>LOKET 1</h3><span id="loket1">-</span></div>
-<div class="loket"><h3>LOKET 2</h3><span id="loket2">-</span></div>
-<div class="loket"><h3>LOKET 3</h3><span id="loket3">-</span></div>
-<div class="loket"><h3>LOKET 4</h3><span id="loket4">-</span></div>
+
+<div class="loket">
+<h3>LOKET 1</h3>
+<span id="loket1">-</span>
+</div>
+
+<div class="loket">
+<h3>LOKET 2</h3>
+<span id="loket2">-</span>
+</div>
+
+<div class="loket">
+<h3>LOKET 3</h3>
+<span id="loket3">-</span>
+</div>
+
+<div class="loket">
+<h3>LOKET 4</h3>
+<span id="loket4">-</span>
+</div>
+
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
+<div>
+Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda dipanggil
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"antrian-bank-prima-nadi"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-
-let audioAktif=false;
-let lastCalled={};
-
-function aktifkanSuara(){
-audioAktif=true;
-speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
-document.getElementById("unlock").style.display="none";
-}
-
-function speak(text){
-if(!audioAktif) return;
-speechSynthesis.cancel();
-setTimeout(()=>{
-const msg=new SpeechSynthesisUtterance(text);
-msg.lang="id-ID";
-speechSynthesis.speak(msg);
-},100);
-}
-
-function formatBaca(nomor,loket){
-return "Nomor antrian "+nomor+" silakan menuju "+loket.replace("loket","loket ");
-}
-
-function listenLoket(id){
-db.ref("loket/"+id).on("value",(snap)=>{
-const data=snap.val();
-if(!data) return;
-
-const nomor=data.nomor;
-const loketBox=document.getElementById(id).parentElement;
-
-document.getElementById(id).innerText=nomor;
-
-if(nomor.startsWith("A")){
-document.getElementById("displayA").innerText = nomor;
-}
-if(nomor.startsWith("B")){
-document.getElementById("displayB").innerText = nomor;
-}
-
-if(lastCalled[id]!==data.waktu){
-
-loketBox.classList.add("active-loket");
-document.getElementById(id).classList.add("blink");
-
-setTimeout(()=>{
-loketBox.classList.remove("active-loket");
-document.getElementById(id).classList.remove("blink");
-},2500);
-
-speak(formatBaca(nomor,id));
-lastCalled[id]=data.waktu;
-}
-});
-}
-
-listenLoket("loket1");
-listenLoket("loket2");
-listenLoket("loket3");
-listenLoket("loket4");
-
-function updateJam(){
-const now=new Date();
-document.getElementById("jam").innerHTML=
-now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+
-"<br>Pukul "+now.toLocaleTimeString("id-ID");
-}
-setInterval(updateJam,1000);
-updateJam();
-</script>
+</div>
 
 </body>
 </html>
+
 
 
 
