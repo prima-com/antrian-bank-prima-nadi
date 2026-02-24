@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard Operator</title>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -16,9 +17,7 @@ margin:0;
 padding:20px;
 }
 
-h1{
-margin-bottom:20px;
-}
+h1{margin-bottom:20px;}
 
 button{
 padding:12px 20px;
@@ -31,13 +30,8 @@ background:#FFD700;
 font-weight:bold;
 }
 
-button:hover{
-opacity:0.8;
-}
-
-.panel{
-margin-top:20px;
-}
+button:hover{opacity:0.8;}
+.panel{margin-top:20px;}
 </style>
 </head>
 <body>
@@ -68,42 +62,57 @@ margin-top:20px;
 </div>
 
 <script>
-// ================= FIREBASE =================
-var firebaseConfig = {
-apiKey: "ISI_API_KEY",
-authDomain: "ISI_AUTH_DOMAIN",
-databaseURL: "ISI_DATABASE_URL",
-projectId: "ISI_PROJECT_ID",
-storageBucket: "ISI_STORAGE",
-messagingSenderId: "ISI_SENDER",
-appId: "ISI_APP_ID"
+
+// ================= FIREBASE SAFE INIT =================
+let db=null;
+
+try{
+var firebaseConfig={
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL:
+"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi",
+storageBucket:
+"antrian-bank-prima-nadi.firebasestorage.app",
+messagingSenderId: "807742809953",
+appId:
+"1:807742809953:web:afeb350b36f4731d36c720"
 };
+
+if(firebaseConfig.apiKey!=="ISI_API_KEY"){
 firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
+db=firebase.database();
+}
+}catch(e){
+console.log("Firebase belum dikonfigurasi");
+}
 
-// ================= LOGIN SYSTEM =================
-const users = {
-"cs123":"cs",
-"teller123":"teller"
-};
-
+// ================= ROLE SYSTEM =================
 let role=null;
 let prefix="";
 let allowedLoket=[];
 let counter=1;
 let lastNomor={};
 
+// ================= LOGIN =================
 function login(){
-const pass=document.getElementById("password").value;
-if(users[pass]){
-role=users[pass];
-document.getElementById("loginBox").style.display="none";
-initRole();
+const pass=document.getElementById("password").value.trim();
+
+if(pass==="cs123"){
+role="cs";
+}else if(pass==="teller123"){
+role="teller";
 }else{
 alert("Password salah!");
-}
+return;
 }
 
+document.getElementById("loginBox").style.display="none";
+initRole();
+}
+
+// ================= INIT ROLE =================
 function initRole(){
 if(role==="cs"){
 prefix="A";
@@ -112,6 +121,7 @@ allowedLoket=["loket1","loket2"];
 prefix="B";
 allowedLoket=["loket3","loket4"];
 }
+
 hideUnauthorized();
 resetIfNewDay();
 }
@@ -160,12 +170,14 @@ if(!allowedLoket.includes(loket)) return;
 const nomor=generateNomor();
 lastNomor[loket]=nomor;
 
+if(db){
 db.ref("loket/"+loket).set({
 nomor:nomor,
 waktu:Date.now()
 });
+}
 
-updateStat();
+console.log("Panggil:",nomor,"ke",loket);
 }
 
 // ================= ULANG =================
@@ -173,24 +185,21 @@ function ulang(loket){
 if(!allowedLoket.includes(loket)) return;
 if(!lastNomor[loket]) return;
 
+if(db){
 db.ref("loket/"+loket).set({
 nomor:lastNomor[loket],
 waktu:Date.now()
 });
 }
 
-// ================= STATISTIK =================
-function updateStat(){
-const key="stat_"+role;
-let stat=parseInt(localStorage.getItem(key))||0;
-stat++;
-localStorage.setItem(key,stat);
-console.log("Total panggilan "+role+" hari ini:",stat);
+console.log("Ulang:",lastNomor[loket]);
 }
+
 </script>
 
 </body>
 </html>
+
 
 
 
