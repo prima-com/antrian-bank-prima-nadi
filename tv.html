@@ -32,7 +32,7 @@ color:#FFD700;
 /* MAIN */
 .container{
 display:flex;
-height:62vh;
+height:58vh; /* sedikit diperkecil supaya ada ruang LPS */
 padding:15px;
 gap:15px;
 }
@@ -90,13 +90,6 @@ padding:15px;
 }
 
 /* TABEL DEPOSITO */
-.promo h2{
-text-align:center;
-color:#FFD700;
-letter-spacing:1px;
-margin-bottom:15px;
-}
-
 .promo table{
 width:100%;
 border-collapse:collapse;
@@ -119,7 +112,6 @@ text-align:center;
 .promo tr:nth-child(even){background:#1b4475;}
 .promo tr:nth-child(odd){background:#163d6b;}
 
-/* Highlight rate tertinggi */
 .highlight-rate{
 color:#FFD700;
 font-weight:bold;
@@ -175,7 +167,6 @@ font-weight:bold;
 text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
 }
 
-/* LOKET AKTIF */
 .active-loket{
 animation:pulse 1.2s ease-in-out 3;
 border:2px solid #FFD700;
@@ -217,6 +208,17 @@ animation:jalan 20s linear infinite;
 @keyframes jalan{
 0%{transform:translateX(0);}
 100%{transform:translateX(-100%);}
+}
+
+/* LPS */
+.lps{
+background:#0e2f5a;
+color:#FFD700;
+text-align:center;
+padding:8px;
+font-weight:bold;
+letter-spacing:1px;
+border-top:2px solid gold;
 }
 
 /* AUDIO UNLOCK */
@@ -264,7 +266,7 @@ cursor:pointer;">
 </div>
 
 <div class="tv">
-<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?si?autoplay=1&mute=1"></iframe>
+<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
 </div>
 
 <div class="promo">
@@ -290,6 +292,11 @@ cursor:pointer;">
 
 </div>
 
+<!-- TEXT LPS -->
+<div class="lps">
+TABUNGAN NASABAH DIJAMIN OLEH LEMBAGA PENJAMIN SIMPANAN (LPS)
+</div>
+
 <div class="mini">
 <div class="loket"><h3>LOKET 1</h3><span id="loket1">-</span></div>
 <div class="loket"><h3>LOKET 2</h3><span id="loket2">-</span></div>
@@ -298,7 +305,7 @@ cursor:pointer;">
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi KPO Cakranegara• Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
+<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -348,7 +355,6 @@ const loketBox=document.getElementById(id).parentElement;
 
 document.getElementById(id).innerText=nomor;
 
-// 🔥 FIX AGAR PANEL KIRI MUNCUL
 if(nomor.startsWith("A")){
 document.getElementById("displayA").innerText = nomor;
 }
@@ -389,6 +395,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
