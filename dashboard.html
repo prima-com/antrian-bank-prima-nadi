@@ -1,238 +1,197 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Operator</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
 body{
 font-family:Arial;
+background:#0e2f5a;
+color:white;
 text-align:center;
-background:#f2f2f2;
+margin:0;
+padding:20px;
+}
+
+h1{
+margin-bottom:20px;
 }
 
 button{
-padding:15px 25px;
-margin:8px;
-font-size:18px;
+padding:12px 20px;
+margin:5px;
+font-size:16px;
 border:none;
-border-radius:8px;
+border-radius:6px;
 cursor:pointer;
-}
-
-.panggil{
-background:#28a745;
-color:white;
-}
-
-.ulang{
-background:#ffc107;
-}
-
-.box{
-background:white;
-padding:20px;
-border-radius:10px;
-display:inline-block;
-margin:10px;
-}
-
-.nomor{
-font-size:32px;
+background:#FFD700;
 font-weight:bold;
+}
+
+button:hover{
+opacity:0.8;
+}
+
+.panel{
+margin-top:20px;
 }
 </style>
 </head>
 <body>
 
-<h2>DASHBOARD OPERATOR</h2>
-
-
-<div class="box">
-<h3>Loket 1 (CS)</h3>
-<div id="loket1" class="nomor">-</div>
-<button class="panggil" onclick="panggil('cs','loket1','A')">PANGGIL</button>
-<button class="ulang" onclick="ulang('loket1')">ULANG</button>
+<!-- LOGIN -->
+<div id="loginBox" style="position:fixed;inset:0;background:#0e2f5a;display:flex;justify-content:center;align-items:center;z-index:9999;">
+  <div style="background:white;padding:30px;border-radius:10px;width:300px;text-align:center;color:black;">
+    <h3>Login Operator</h3>
+    <input type="password" id="password" placeholder="Masukkan Password" style="width:100%;padding:10px;margin-bottom:10px;">
+    <button onclick="login()">Masuk</button>
+  </div>
 </div>
 
+<h1>DASHBOARD OPERATOR</h1>
 
-<div class="box">
-<h3>Loket 2 (TELLER)</h3>
-<div id="loket2" class="nomor">-</div>
-<button class="panggil" onclick="panggil('teller','loket2','B')">PANGGIL</button>
-<button class="ulang" onclick="ulang('loket2')">ULANG</button>
+<div class="panel">
+<button onclick="panggil('loket1')">Panggil Loket 1</button>
+<button onclick="ulang('loket1')">Ulang Loket 1</button><br>
+
+<button onclick="panggil('loket2')">Panggil Loket 2</button>
+<button onclick="ulang('loket2')">Ulang Loket 2</button><br>
+
+<button onclick="panggil('loket3')">Panggil Loket 3</button>
+<button onclick="ulang('loket3')">Ulang Loket 3</button><br>
+
+<button onclick="panggil('loket4')">Panggil Loket 4</button>
+<button onclick="ulang('loket4')">Ulang Loket 4</button>
 </div>
-
-
-<div class="box">
-<h3>Loket 3 (TELLER)</h3>
-<div id="loket3" class="nomor">-</div>
-<button class="panggil" onclick="panggil('teller','loket3','B')">PANGGIL</button>
-<button class="ulang" onclick="ulang('loket3')">ULANG</button>
-</div>
-
-
-<div class="box">
-<h3>Loket 4 (TELLER)</h3>
-<div id="loket4" class="nomor">-</div>
-<button class="panggil" onclick="panggil('teller','loket4','B')">PANGGIL</button>
-<button class="ulang" onclick="ulang('loket4')">ULANG</button>
-</div>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
+// ================= FIREBASE =================
+var firebaseConfig = {
+apiKey: "ISI_API_KEY",
+authDomain: "ISI_AUTH_DOMAIN",
+databaseURL: "ISI_DATABASE_URL",
+projectId: "ISI_PROJECT_ID",
+storageBucket: "ISI_STORAGE",
+messagingSenderId: "ISI_SENDER",
+appId: "ISI_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
 
-const firebaseConfig = {
-
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-
-databaseURL:
-"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-projectId: "antrian-bank-prima-nadi",
-
-storageBucket:
-"antrian-bank-prima-nadi.firebasestorage.app",
-
-messagingSenderId: "807742809953",
-
-appId:
-"1:807742809953:web:afeb350b36f4731d36c720"
-
+// ================= LOGIN SYSTEM =================
+const users = {
+"cs123":"cs",
+"teller123":"teller"
 };
 
-firebase.initializeApp(firebaseConfig);
+let role=null;
+let prefix="";
+let allowedLoket=[];
+let counter=1;
+let lastNomor={};
 
-const db = firebase.database();
+function login(){
+const pass=document.getElementById("password").value;
+if(users[pass]){
+role=users[pass];
+document.getElementById("loginBox").style.display="none";
+initRole();
+}else{
+alert("Password salah!");
+}
+}
 
+function initRole(){
+if(role==="cs"){
+prefix="A";
+allowedLoket=["loket1","loket2"];
+}else{
+prefix="B";
+allowedLoket=["loket3","loket4"];
+}
+hideUnauthorized();
+resetIfNewDay();
+}
 
-// unlock audio
-document.body.addEventListener("click",()=>{
-speechSynthesis.resume();
+// ================= BATASI LOKET =================
+function hideUnauthorized(){
+document.querySelectorAll("button").forEach(btn=>{
+const oc=btn.getAttribute("onclick");
+if(oc){
+const match=oc.match(/'(loket\d+)'/);
+if(match){
+if(!allowedLoket.includes(match[1])){
+btn.style.display="none";
+}
+}
+}
 });
-
-
-// SPEAK
-function speak(text){
-
-speechSynthesis.cancel();
-
-setTimeout(()=>{
-
-const msg = new SpeechSynthesisUtterance(text);
-
-msg.lang="id-ID";
-msg.rate=0.9;
-
-speechSynthesis.speak(msg);
-
-},100);
-
 }
 
+// ================= RESET HARIAN =================
+function resetIfNewDay(){
+const today=new Date().toISOString().slice(0,10);
+const lastDate=localStorage.getItem("lastDate");
 
-// FORMAT
-function panggilSuara(nomor,loket){
-
-const noBaca =
-nomor.replace(/^([A-Z])0+/,"$1 ");
-
-const teks =
-"Nomor antrian "+
-noBaca.split("").join(" ")+
-" silakan menuju "+
-loket.replace("loket","loket ");
-
-speak(teks);
-
+if(lastDate!==today){
+localStorage.setItem("counterA",1);
+localStorage.setItem("counterB",1);
+localStorage.setItem("lastDate",today);
 }
 
+counter=parseInt(localStorage.getItem("counter"+prefix))||1;
+}
 
-// PANGGIL
-function panggil(type,loket,kode){
+// ================= GENERATE NOMOR =================
+function generateNomor(){
+const nomor=prefix+String(counter).padStart(3,"0");
+localStorage.setItem("counter"+prefix,counter+1);
+counter++;
+return nomor;
+}
 
-const ref = db.ref("antrian/"+type+"/current");
+// ================= PANGGIL =================
+function panggil(loket){
+if(!allowedLoket.includes(loket)) return;
 
-ref.once("value").then(snap=>{
-
-let nomor = snap.val() || 0;
-
-nomor++;
-
-ref.set(nomor);
-
-const tampil =
-kode + nomor.toString().padStart(3,"0");
+const nomor=generateNomor();
+lastNomor[loket]=nomor;
 
 db.ref("loket/"+loket).set({
-
-nomor: tampil,
-waktu: Date.now()
-
+nomor:nomor,
+waktu:Date.now()
 });
 
-panggilSuara(tampil,loket);
-
-});
-
+updateStat();
 }
 
-
-// ULANG
+// ================= ULANG =================
 function ulang(loket){
-
-db.ref("loket/"+loket).once("value")
-.then(snap=>{
-
-const data = snap.val();
-
-if(!data || !data.nomor){
-
-alert("Belum ada nomor");
-
-return;
-
-}
+if(!allowedLoket.includes(loket)) return;
+if(!lastNomor[loket]) return;
 
 db.ref("loket/"+loket).set({
-
-nomor: data.nomor,
-waktu: Date.now()
-
+nomor:lastNomor[loket],
+waktu:Date.now()
 });
-
-panggilSuara(data.nomor,loket);
-
-});
-
 }
 
-
-// realtime display
-["loket1","loket2","loket3","loket4"]
-.forEach(id=>{
-
-db.ref("loket/"+id).on("value",snap=>{
-
-const data = snap.val();
-
-document.getElementById(id).innerText =
-data ? data.nomor : "-";
-
-});
-
-});
-
+// ================= STATISTIK =================
+function updateStat(){
+const key="stat_"+role;
+let stat=parseInt(localStorage.getItem(key))||0;
+stat++;
+localStorage.setItem(key,stat);
+console.log("Total panggilan "+role+" hari ini:",stat);
+}
 </script>
 
 </body>
 </html>
+
 
 
 
