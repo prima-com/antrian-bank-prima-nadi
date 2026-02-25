@@ -1,130 +1,101 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mesin Antrian Bank</title>
+<title>Ambil Nomor Antrian - Bank Prima Nadi</title>
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#0b3d91;
-    color:white;
-    text-align:center;
-    margin:0;
-}
-
-.container{
-    margin-top:80px;
-}
-
-h1{
-    font-size:42px;
-    margin-bottom:10px;
-}
-
-.subtitle{
-    font-size:20px;
-    margin-bottom:60px;
-}
-
-.btn{
-    display:block;
-    width:320px;
-    margin:25px auto;
-    padding:25px;
-    font-size:28px;
-    border:none;
-    border-radius:15px;
-    cursor:pointer;
-    font-weight:bold;
-    transition:.3s;
-}
-
-.btn-teller{
-    background:#28a745;
-    color:white;
-}
-
-.btn-cs{
-    background:#ffc107;
-    color:black;
-}
-
-.btn:hover{
-    transform:scale(1.05);
-}
-
-.footer{
-    position:fixed;
-    bottom:20px;
-    width:100%;
-    font-size:14px;
-    opacity:.7;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-    <h1>MESIN ANTRIAN</h1>
-    <div class="subtitle">Silakan Pilih Layanan</div>
-
-    <button class="btn btn-teller" onclick="ambilTeller()">
-        AMBIL NOMOR TELLER
-    </button>
-
-    <button class="btn btn-cs" onclick="ambilCS()">
-        AMBIL NOMOR CUSTOMER SERVICE
-    </button>
-</div>
-
-<div class="footer">
-    PT. BPR Prima Nadi
-</div>
-
-
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
+<style>
+body{
+font-family:Arial;
+background:#0b2d57;
+color:white;
+text-align:center;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+h1{font-size:40px;margin-bottom:40px;}
+button{
+width:300px;
+padding:25px;
+margin:20px;
+font-size:28px;
+font-weight:bold;
+border:none;
+border-radius:20px;
+cursor:pointer;
+background:gold;
+color:black;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+}
+button:hover{transform:scale(1.05);}
+#hasil{
+margin-top:40px;
+font-size:70px;
+color:gold;
+font-weight:bold;
+text-shadow:0 0 10px gold,0 0 20px rgba(255,215,0,0.8);
+}
+</style>
+</head>
+<body>
+
+<h1>Silakan Ambil Nomor Antrian</h1>
+
+<button onclick="ambilNomor('A')">Customer Service</button>
+<button onclick="ambilNomor('B')">Teller</button>
+
+<div id="hasil"></div>
+
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-  authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-  databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "antrian-bank-prima-nadi",
-  storageBucket: "antrian-bank-prima-nadi.firebasestorage.app",
-  messagingSenderId: "807742809953",
-  appId: "1:807742809953:web:afeb350b36f4731d36c720"
+
+var firebaseConfig = {
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+var db = firebase.database();
 
+function ambilNomor(prefix){
 
-function ambilTeller() {
-  let ref = db.ref("antrian/teller/last");
+db.ref("counter/"+prefix).transaction(function(current){
+if(current===null) return 2;
+return current+1;
+},function(error,committed,snapshot){
 
-  ref.transaction((current) => {
-    return (current || 0) + 1;
-  });
+if(committed){
 
-  alert("Nomor Teller berhasil diambil");
+let nomor = prefix + String(snapshot.val()-1).padStart(3,"0");
+
+// MASUKKAN KE QUEUE WAITING
+db.ref("queue/"+prefix).push({
+nomor: nomor,
+waktu: Date.now(),
+status: "waiting"
+});
+
+document.getElementById("hasil").innerText = nomor;
+
+setTimeout(()=>{
+document.getElementById("hasil").innerText="";
+},5000);
+
 }
 
-
-function ambilCS() {
-  let ref = db.ref("antrian/cs/last");
-
-  ref.transaction((current) => {
-    return (current || 0) + 1;
-  });
-
-  alert("Nomor Customer Service berhasil diambil");
+});
 }
+
 </script>
 
 </body>
 </html>
+
