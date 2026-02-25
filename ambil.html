@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Ambil Nomor Antrian - Bank Prima Nadi</title>
+<title>Ambil Nomor Antrian - Ultimate Core</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -32,15 +32,17 @@ border-radius:20px;
 cursor:pointer;
 background:gold;
 color:black;
-box-shadow:0 5px 15px rgba(0,0,0,0.4);
 }
-button:hover{transform:scale(1.05);}
 #hasil{
-margin-top:40px;
+margin-top:30px;
 font-size:70px;
 color:gold;
 font-weight:bold;
-text-shadow:0 0 10px gold,0 0 20px rgba(255,215,0,0.8);
+}
+#estimasi{
+margin-top:15px;
+font-size:20px;
+color:#FFD700;
 }
 </style>
 </head>
@@ -52,18 +54,19 @@ text-shadow:0 0 10px gold,0 0 20px rgba(255,215,0,0.8);
 <button onclick="ambilNomor('B')">Teller</button>
 
 <div id="hasil"></div>
+<div id="estimasi"></div>
 
 <script>
 
 var firebaseConfig = {
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi"
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
+var db=firebase.database();
 
 function checkReset(){
 const today=new Date().toISOString().slice(0,10);
@@ -76,7 +79,8 @@ db.ref("queue").remove();
 db.ref("stats").set({
 totalWaiting:0,
 totalToday:0,
-totalCalled:0
+totalCalled:0,
+avgServiceTime:0
 });
 db.ref("config/lastReset").set(today);
 
@@ -88,22 +92,20 @@ function ambilNomor(prefix){
 
 checkReset();
 
-db.ref("counter/"+prefix).transaction(function(current){
+db.ref("counter/"+prefix).transaction(current=>{
 if(current===null) return 2;
 return current+1;
-},function(error,committed,snapshot){
+},(error,committed,snapshot)=>{
 
 if(committed){
 
-let nomor = prefix + String(snapshot.val()-1).padStart(3,"0");
+let nomor=prefix+String(snapshot.val()-1).padStart(3,"0");
 
-let dataAntrian={
+db.ref("queue/"+prefix).push({
 nomor:nomor,
 waktu:Date.now(),
 status:"waiting"
-};
-
-db.ref("queue/"+prefix).push(dataAntrian);
+});
 
 db.ref("stats/totalWaiting").transaction(v=>(v||0)+1);
 db.ref("stats/totalToday").transaction(v=>(v||0)+1);
@@ -115,12 +117,27 @@ document.getElementById("hasil").innerText="";
 },5000);
 
 }
-
 });
 }
+
+// ESTIMASI WAKTU
+db.ref("stats").on("value",snap=>{
+let s=snap.val();
+if(!s) return;
+
+let avg=s.avgServiceTime||0;
+let waiting=s.totalWaiting||0;
+
+if(avg>0){
+let estimasi=Math.round((avg*waiting)/60000);
+document.getElementById("estimasi").innerText=
+"Estimasi tunggu sekitar "+estimasi+" menit";
+}
+});
 
 </script>
 </body>
 </html>
+
 
 
