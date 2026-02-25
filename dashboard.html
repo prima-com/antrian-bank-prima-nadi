@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator Enterprise MAX</title>
+<title>Dashboard Operator Ultimate Core</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -17,32 +17,13 @@ margin:0;
 padding:20px;
 }
 button{
-padding:12px 20px;
+padding:10px 15px;
 margin:5px;
-font-size:16px;
+font-size:14px;
 border:none;
 border-radius:6px;
-cursor:pointer;
 background:#FFD700;
-font-weight:bold;
-}
-button:hover{opacity:0.8;}
-.loginBox{
-position:fixed;
-inset:0;
-background:#0e2f5a;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-.loginContent{
-background:white;
-padding:30px;
-border-radius:10px;
-width:300px;
-text-align:center;
-color:black;
+cursor:pointer;
 }
 #statsBox{
 margin-top:20px;
@@ -52,100 +33,49 @@ font-size:18px;
 </head>
 <body>
 
-<div class="loginBox" id="loginBox">
-<div class="loginContent">
-<h3>Login Operator</h3>
-<input type="text" id="username" placeholder="Username" style="width:100%;padding:10px;margin-bottom:10px;">
-<input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px;">
-<button onclick="login()">Masuk</button>
-</div>
-</div>
-
 <h1>DASHBOARD OPERATOR</h1>
-<div id="operatorInfo"></div>
 
 <div>
 <button onclick="panggil('loket1')">Panggil Loket 1</button>
-<button onclick="ulang('loket1')">Ulang Loket 1</button><br>
+<button onclick="selesai('loket1')">Selesai Loket 1</button><br>
 
 <button onclick="panggil('loket2')">Panggil Loket 2</button>
-<button onclick="ulang('loket2')">Ulang Loket 2</button><br>
+<button onclick="selesai('loket2')">Selesai Loket 2</button><br>
 
 <button onclick="panggil('loket3')">Panggil Loket 3</button>
-<button onclick="ulang('loket3')">Ulang Loket 3</button><br>
+<button onclick="selesai('loket3')">Selesai Loket 3</button><br>
 
 <button onclick="panggil('loket4')">Panggil Loket 4</button>
-<button onclick="ulang('loket4')">Ulang Loket 4</button>
+<button onclick="selesai('loket4')">Selesai Loket 4</button>
 </div>
 
-<h2>STATISTIK HARI INI</h2>
+<h2>STATISTIK</h2>
 <div id="statsBox"></div>
 
 <script>
 
 var firebaseConfig = {
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi"
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
+var db=firebase.database();
 
-let role=null;
-let allowedLoket=[];
-let lastNomor={};
 let busyLoket={};
-
-function login(){
-const username=document.getElementById("username").value;
-const password=document.getElementById("password").value;
-
-db.ref("users/"+username).once("value",snap=>{
-if(!snap.exists()){alert("User tidak ditemukan");return;}
-const data=snap.val();
-if(data.password!==password){alert("Password salah");return;}
-role=data.role;
-document.getElementById("loginBox").style.display="none";
-initRole();
-});
-}
-
-function initRole(){
-if(role==="cs"){
-allowedLoket=["loket1","loket2"];
-}else{
-allowedLoket=["loket3","loket4"];
-}
-document.getElementById("operatorInfo").innerHTML=
-"<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
-
-hideUnauthorized();
-}
-
-function hideUnauthorized(){
-document.querySelectorAll("button").forEach(btn=>{
-const oc=btn.getAttribute("onclick");
-if(oc){
-const match=oc.match(/'(loket\d+)'/);
-if(match){
-if(!allowedLoket.includes(match[1])){
-btn.style.display="none";
-}
-}
-}
-});
-}
+let serviceStartTime={};
+let lastNomor={};
 
 function panggil(loket){
 
 if(busyLoket[loket]) return;
 busyLoket[loket]=true;
 
-let prefixLoket=(loket==="loket1"||loket==="loket2")?"A":"B";
+let prefix=(loket==="loket1"||loket==="loket2")?"A":"B";
 
-db.ref("queue/"+prefixLoket)
+db.ref("queue/"+prefix)
 .orderByChild("status")
 .equalTo("waiting")
 .limitToFirst(1)
@@ -160,17 +90,20 @@ return;
 let key=Object.keys(snap.val())[0];
 let data=snap.val()[key];
 
-lastNomor[loket]=data.nomor;
+let now=Date.now();
 
-db.ref("queue/"+prefixLoket+"/"+key).update({
-status:"called",
-calledTime:Date.now(),
+lastNomor[loket]=data.nomor;
+serviceStartTime[loket]=now;
+
+db.ref("queue/"+prefix+"/"+key).update({
+status:"serving",
+calledTime:now,
 loket:loket
 });
 
 db.ref("loket/"+loket).set({
 nomor:data.nomor,
-waktu:Date.now()
+waktu:now
 });
 
 db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
@@ -180,27 +113,53 @@ let today=new Date().toISOString().slice(0,10);
 db.ref("history/"+today).push({
 nomor:data.nomor,
 loket:loket,
-waktu:Date.now()
+waktu:now
 });
 
-setTimeout(()=>{
-busyLoket[loket]=false;
-},1500);
+setTimeout(()=>{busyLoket[loket]=false;},1500);
 
 });
 }
 
-function ulang(loket){
-if(!lastNomor[loket]) return;
-db.ref("loket/"+loket).set({
-nomor:lastNomor[loket],
-waktu:Date.now()
+function selesai(loket){
+
+if(!serviceStartTime[loket]) return;
+
+let duration=Date.now()-serviceStartTime[loket];
+
+db.ref("performance/"+loket+"/totalServed").transaction(v=>(v||0)+1);
+db.ref("performance/"+loket+"/totalDuration").transaction(v=>(v||0)+duration);
+
+serviceStartTime[loket]=null;
+
+updateAverage();
+}
+
+function updateAverage(){
+
+db.ref("performance").once("value",snap=>{
+let perf=snap.val();
+if(!perf) return;
+
+let totalDur=0;
+let totalSrv=0;
+
+Object.values(perf).forEach(l=>{
+totalDur+=l.totalDuration||0;
+totalSrv+=l.totalServed||0;
+});
+
+if(totalSrv>0){
+db.ref("stats/avgServiceTime").set(totalDur/totalSrv);
+}
 });
 }
 
+// STATISTIK LIVE
 db.ref("stats").on("value",snap=>{
 let s=snap.val();
 if(!s) return;
+
 document.getElementById("statsBox").innerHTML=
 "Total Antrian: "+(s.totalToday||0)+"<br>"+
 "Sudah Dipanggil: "+(s.totalCalled||0)+"<br>"+
@@ -210,6 +169,7 @@ document.getElementById("statsBox").innerHTML=
 </script>
 </body>
 </html>
+
 
 
 
