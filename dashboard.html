@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator Enterprise PRO</title>
+<title>Dashboard Operator Enterprise MAX</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -44,6 +44,10 @@ width:300px;
 text-align:center;
 color:black;
 }
+#statsBox{
+margin-top:20px;
+font-size:18px;
+}
 </style>
 </head>
 <body>
@@ -74,6 +78,9 @@ color:black;
 <button onclick="ulang('loket4')">Ulang Loket 4</button>
 </div>
 
+<h2>STATISTIK HARI INI</h2>
+<div id="statsBox"></div>
+
 <script>
 
 var firebaseConfig = {
@@ -87,9 +94,9 @@ firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
 
 let role=null;
-let prefix="";
 let allowedLoket=[];
 let lastNomor={};
+let busyLoket={};
 
 function login(){
 const username=document.getElementById("username").value;
@@ -107,14 +114,13 @@ initRole();
 
 function initRole(){
 if(role==="cs"){
-prefix="A";
 allowedLoket=["loket1","loket2"];
 }else{
-prefix="B";
 allowedLoket=["loket3","loket4"];
 }
 document.getElementById("operatorInfo").innerHTML=
 "<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
+
 hideUnauthorized();
 }
 
@@ -133,9 +139,11 @@ btn.style.display="none";
 }
 
 function panggil(loket){
-if(!allowedLoket.includes(loket)) return;
 
-let prefixLoket = (loket==="loket1"||loket==="loket2")?"A":"B";
+if(busyLoket[loket]) return;
+busyLoket[loket]=true;
+
+let prefixLoket=(loket==="loket1"||loket==="loket2")?"A":"B";
 
 db.ref("queue/"+prefixLoket)
 .orderByChild("status")
@@ -145,6 +153,7 @@ db.ref("queue/"+prefixLoket)
 
 if(!snap.exists()){
 alert("Tidak ada antrian");
+busyLoket[loket]=false;
 return;
 }
 
@@ -154,13 +163,29 @@ let data=snap.val()[key];
 lastNomor[loket]=data.nomor;
 
 db.ref("queue/"+prefixLoket+"/"+key).update({
-status:"called"
+status:"called",
+calledTime:Date.now(),
+loket:loket
 });
 
 db.ref("loket/"+loket).set({
 nomor:data.nomor,
 waktu:Date.now()
 });
+
+db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
+db.ref("stats/totalCalled").transaction(v=>(v||0)+1);
+
+let today=new Date().toISOString().slice(0,10);
+db.ref("history/"+today).push({
+nomor:data.nomor,
+loket:loket,
+waktu:Date.now()
+});
+
+setTimeout(()=>{
+busyLoket[loket]=false;
+},1500);
 
 });
 }
@@ -173,9 +198,19 @@ waktu:Date.now()
 });
 }
 
+db.ref("stats").on("value",snap=>{
+let s=snap.val();
+if(!s) return;
+document.getElementById("statsBox").innerHTML=
+"Total Antrian: "+(s.totalToday||0)+"<br>"+
+"Sudah Dipanggil: "+(s.totalCalled||0)+"<br>"+
+"Sisa Menunggu: "+(s.totalWaiting||0);
+});
+
 </script>
 </body>
 </html>
+
 
 
 
