@@ -2,27 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator Ultimate Core</title>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<style>
-body{
-font-family:Arial;
-background:#0e2f5a;
-color:white;
-text-align:center;
-margin:0;
-padding:20px;
-}
-button{
-padding:10px 15px;
-margin:5px;<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Dashboard Operator Enterprise Ultimate</title>
+<title>Dashboard Operator Enterprise MAX</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -86,20 +66,16 @@ font-size:18px;
 
 <div>
 <button onclick="panggil('loket1')">Panggil Loket 1</button>
-<button onclick="ulang('loket1')">Ulang Loket 1</button>
-<button onclick="selesai('loket1')">Selesai Loket 1</button><br>
+<button onclick="ulang('loket1')">Ulang Loket 1</button><br>
 
 <button onclick="panggil('loket2')">Panggil Loket 2</button>
-<button onclick="ulang('loket2')">Ulang Loket 2</button>
-<button onclick="selesai('loket2')">Selesai Loket 2</button><br>
+<button onclick="ulang('loket2')">Ulang Loket 2</button><br>
 
 <button onclick="panggil('loket3')">Panggil Loket 3</button>
-<button onclick="ulang('loket3')">Ulang Loket 3</button>
-<button onclick="selesai('loket3')">Selesai Loket 3</button><br>
+<button onclick="ulang('loket3')">Ulang Loket 3</button><br>
 
 <button onclick="panggil('loket4')">Panggil Loket 4</button>
 <button onclick="ulang('loket4')">Ulang Loket 4</button>
-<button onclick="selesai('loket4')">Selesai Loket 4</button>
 </div>
 
 <h2>STATISTIK HARI INI</h2>
@@ -108,22 +84,20 @@ font-size:18px;
 <script>
 
 var firebaseConfig = {
-apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId:"antrian-bank-prima-nadi"
+apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "antrian-bank-prima-nadi"
 };
 
 firebase.initializeApp(firebaseConfig);
-var db=firebase.database();
+var db = firebase.database();
 
 let role=null;
 let allowedLoket=[];
 let lastNomor={};
 let busyLoket={};
-let serviceStartTime={};
 
-// LOGIN
 function login(){
 const username=document.getElementById("username").value;
 const password=document.getElementById("password").value;
@@ -144,15 +118,12 @@ allowedLoket=["loket1","loket2"];
 }else{
 allowedLoket=["loket3","loket4"];
 }
-
 document.getElementById("operatorInfo").innerHTML=
 "<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
 
 hideUnauthorized();
-checkResetServer();
 }
 
-// BATASI LOKET
 function hideUnauthorized(){
 document.querySelectorAll("button").forEach(btn=>{
 const oc=btn.getAttribute("onclick");
@@ -167,39 +138,14 @@ btn.style.display="none";
 });
 }
 
-// RESET HARIAN
-function checkResetServer(){
-const today=new Date().toISOString().slice(0,10);
-
-db.ref("config/lastReset").once("value",snap=>{
-if(snap.val()!==today){
-db.ref("counter").set({A:1,B:1});
-db.ref("queue").remove();
-db.ref("stats").set({
-totalWaiting:0,
-totalToday:0,
-totalCalled:0,
-avgServiceTime:0
-});
-db.ref("config/lastReset").set(today);
-}
-});
-}
-
-// PANGGIL
 function panggil(loket){
 
 if(busyLoket[loket]) return;
 busyLoket[loket]=true;
 
-if(!allowedLoket.includes(loket)){
-busyLoket[loket]=false;
-return;
-}
+let prefixLoket=(loket==="loket1"||loket==="loket2")?"A":"B";
 
-let prefix=(loket==="loket1"||loket==="loket2")?"A":"B";
-
-db.ref("queue/"+prefix)
+db.ref("queue/"+prefixLoket)
 .orderByChild("status")
 .equalTo("waiting")
 .limitToFirst(1)
@@ -214,20 +160,17 @@ return;
 let key=Object.keys(snap.val())[0];
 let data=snap.val()[key];
 
-let now=Date.now();
-
 lastNomor[loket]=data.nomor;
-serviceStartTime[loket]=now;
 
-db.ref("queue/"+prefix+"/"+key).update({
-status:"serving",
-calledTime:now,
+db.ref("queue/"+prefixLoket+"/"+key).update({
+status:"called",
+calledTime:Date.now(),
 loket:loket
 });
 
 db.ref("loket/"+loket).set({
 nomor:data.nomor,
-waktu:now
+waktu:Date.now()
 });
 
 db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
@@ -237,15 +180,16 @@ let today=new Date().toISOString().slice(0,10);
 db.ref("history/"+today).push({
 nomor:data.nomor,
 loket:loket,
-waktu:now
+waktu:Date.now()
 });
 
-setTimeout(()=>{busyLoket[loket]=false;},1500);
+setTimeout(()=>{
+busyLoket[loket]=false;
+},1500);
 
 });
 }
 
-// ULANG
 function ulang(loket){
 if(!lastNomor[loket]) return;
 db.ref("loket/"+loket).set({
@@ -254,44 +198,9 @@ waktu:Date.now()
 });
 }
 
-// SELESAI
-function selesai(loket){
-if(!serviceStartTime[loket]) return;
-
-let duration=Date.now()-serviceStartTime[loket];
-
-db.ref("performance/"+loket+"/totalServed").transaction(v=>(v||0)+1);
-db.ref("performance/"+loket+"/totalDuration").transaction(v=>(v||0)+duration);
-
-serviceStartTime[loket]=null;
-updateAverage();
-}
-
-// HITUNG AVERAGE SERVICE
-function updateAverage(){
-db.ref("performance").once("value",snap=>{
-let perf=snap.val();
-if(!perf) return;
-
-let totalDur=0;
-let totalSrv=0;
-
-Object.values(perf).forEach(l=>{
-totalDur+=l.totalDuration||0;
-totalSrv+=l.totalServed||0;
-});
-
-if(totalSrv>0){
-db.ref("stats/avgServiceTime").set(totalDur/totalSrv);
-}
-});
-}
-
-// STATISTIK LIVE
 db.ref("stats").on("value",snap=>{
 let s=snap.val();
 if(!s) return;
-
 document.getElementById("statsBox").innerHTML=
 "Total Antrian: "+(s.totalToday||0)+"<br>"+
 "Sudah Dipanggil: "+(s.totalCalled||0)+"<br>"+
@@ -301,6 +210,7 @@ document.getElementById("statsBox").innerHTML=
 </script>
 </body>
 </html>
+
 
 
 
