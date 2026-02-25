@@ -68,9 +68,17 @@ color:gold;
 text-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.7);
 }
 
+/* TV WRAPPER */
+.tv-wrapper{
+width:45%;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
 /* TV */
 .tv{
-width:45%;
+height:85%;
 border-radius:15px;
 overflow:hidden;
 }
@@ -79,6 +87,21 @@ overflow:hidden;
 width:100%;
 height:100%;
 border:none;
+}
+
+/* FRAME PENJAMINAN */
+.penjaminan{
+height:15%;
+background:#1d4c84;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+font-weight:bold;
+letter-spacing:2px;
+color:#FFD700;
+box-shadow:0 0 10px rgba(255,215,0,0.4);
 }
 
 /* PROMO */
@@ -119,7 +142,6 @@ text-align:center;
 .promo tr:nth-child(even){background:#1b4475;}
 .promo tr:nth-child(odd){background:#163d6b;}
 
-/* Highlight rate tertinggi */
 .highlight-rate{
 color:#FFD700;
 font-weight:bold;
@@ -175,7 +197,6 @@ font-weight:bold;
 text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
 }
 
-/* LOKET AKTIF */
 .active-loket{
 animation:pulse 1.2s ease-in-out 3;
 border:2px solid #FFD700;
@@ -263,9 +284,15 @@ cursor:pointer;">
 <div class="box big"><div class="title">NOMOR ANTRIAN</div><div class="nomor" id="displayB">-</div></div>
 </div>
 
+<div class="tv-wrapper">
 <div class="tv">
-<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?si?autoplay=1&mute=1"></iframe></div>
-  
+<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
+</div>
+<div class="penjaminan">
+Penjaminan
+</div>
+</div>
+
 <div class="promo">
 <table>
 <tr>
@@ -297,7 +324,7 @@ cursor:pointer;">
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi KPO Cakranegara• Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
+<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -347,7 +374,6 @@ const loketBox=document.getElementById(id).parentElement;
 
 document.getElementById(id).innerText=nomor;
 
-// 🔥 FIX AGAR PANEL KIRI MUNCUL
 if(nomor.startsWith("A")){
 document.getElementById("displayA").innerText = nomor;
 }
@@ -388,6 +414,7 @@ updateJam();
 
 </body>
 </html>
+
 
 
 
