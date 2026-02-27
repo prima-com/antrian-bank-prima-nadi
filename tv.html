@@ -123,10 +123,27 @@ transition:opacity 0.8s ease;
 animation:glowPulse 2s infinite alternate;
 }
 
-/* Glow tipis hidup */
+/* Glow hidup */
 @keyframes glowPulse{
 from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
 to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
+}
+
+/* KHUSUS SLIDE PROMO2 */
+.slide-in{
+animation:slideFromLeft 2.5s ease forwards,
+glowPulse 2s infinite alternate;
+}
+
+@keyframes slideFromLeft{
+from{
+transform:translateX(-120px);
+opacity:0;
+}
+to{
+transform:translateX(0);
+opacity:1;
+}
 }
 
 .promo table{
@@ -317,7 +334,7 @@ cursor:pointer;">
 <td>5,25 %</td>
 </tr>
 <tr>
-<td> 500 jt keatas</td>
+<td>500 jt keatas</td>
 <td class="highlight-rate">5,50 %</td>
 </tr>
 </table>
@@ -421,24 +438,33 @@ now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"
 setInterval(updateJam,1000);
 updateJam();
 
-/* AUTO GANTI GAMBAR PROMO */
+/* AUTO ROTATE GAMBAR */
 const promoImages=["promo1.png","promo2.png","promo3.png"];
 let promoIndex=0;
 const promoEl=document.getElementById("promoImage");
 
 setInterval(()=>{
+promoEl.classList.remove("slide-in");
 promoEl.style.opacity=0;
+
 setTimeout(()=>{
 promoIndex=(promoIndex+1)%promoImages.length;
 promoEl.src=promoImages[promoIndex];
+
+if(promoImages[promoIndex]==="promo2.png"){
+promoEl.classList.add("slide-in");
+}else{
 promoEl.style.opacity=1;
+}
 },800);
+
 },5000);
 
 </script>
 
 </body>
 </html>
+
 
 
 
