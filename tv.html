@@ -76,6 +76,7 @@ flex-direction:column;
 gap:10px;
 }
 
+/* TV */
 .tv{
 height:85%;
 border-radius:15px;
@@ -88,6 +89,7 @@ height:100%;
 border:none;
 }
 
+/* FRAME PENJAMINAN */
 .penjaminan{
 height:15%;
 background:#1d4c84;
@@ -102,17 +104,26 @@ color:#FFD700;
 box-shadow:0 0 10px rgba(255,215,0,0.4);
 }
 
-/* ========================= */
-/* PROMO UPGRADE SECTION */
-/* ========================= */
+/* ================= */
+/* PROMO ORIGINAL + FOTO */
+/* ================= */
 
 .promo{
 width:27%;
 background:#163d6b;
 border-radius:15px;
 padding:15px;
-position:relative;
+position:relative;   /* tambahan agar foto bisa absolute */
 overflow:hidden;
+}
+
+/* FOTO POJOK KANAN BAWAH */
+.promo-img{
+position:absolute;
+bottom:10px;
+right:10px;
+width:90px;
+opacity:0.95;
 }
 
 .promo h2{
@@ -158,32 +169,6 @@ animation:goldPulse 2s infinite;
 0%{transform:scale(1);}
 50%{transform:scale(1.08);}
 100%{transform:scale(1);}
-}
-
-/* FOTO PROMO */
-
-.promo-img{
-position:absolute;
-bottom:10px;
-right:10px;
-width:110px;
-opacity:0;
-animation:
-fadeIn 2s ease forwards,
-floating 4s ease-in-out infinite;
-filter:drop-shadow(0 0 10px gold);
-}
-
-/* Fade In */
-@keyframes fadeIn{
-to{opacity:1;}
-}
-
-/* Floating effect */
-@keyframes floating{
-0%{transform:translateY(0px);}
-50%{transform:translateY(-8px);}
-100%{transform:translateY(0px);}
 }
 
 /* MINI LOKET */
@@ -268,6 +253,7 @@ animation:jalan 20s linear infinite;
 100%{transform:translateX(-100%);}
 }
 
+/* AUDIO UNLOCK */
 #unlock{
 position:fixed;
 top:0;
@@ -284,6 +270,18 @@ z-index:9999;
 </head>
 
 <body>
+
+<div id="unlock">
+<button onclick="aktifkanSuara()" style="
+font-size:30px;
+padding:20px 40px;
+background:gold;
+border:none;
+border-radius:15px;
+cursor:pointer;">
+🔊 AKTIFKAN SUARA
+</button>
+</div>
 
 <div class="header">
 <img src="logo_pn.png" height="100%">
@@ -328,19 +326,29 @@ z-index:9999;
 </tr>
 </table>
 
-<!-- FOTO PROMO -->
+<!-- FOTO TAMBAHAN -->
 <img src="promo.png" class="promo-img">
 
 </div>
 
 </div>
 
+<div class="mini">
+<div class="loket"><h3>LOKET 1</h3><span id="loket1">-</span></div>
+<div class="loket"><h3>LOKET 2</h3><span id="loket2">-</span></div>
+<div class="loket"><h3>LOKET 3</h3><span id="loket3">-</span></div>
+<div class="loket"><h3>LOKET 4</h3><span id="loket4">-</span></div>
+</div>
+
 <div class="running">
 <div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
+<!-- Firebase tetap sama seperti script asli kamu -->
+
 </body>
 </html>
+
 
 
 
