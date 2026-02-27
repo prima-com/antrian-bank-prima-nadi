@@ -76,7 +76,6 @@ flex-direction:column;
 gap:10px;
 }
 
-/* TV */
 .tv{
 height:85%;
 border-radius:15px;
@@ -110,22 +109,24 @@ width:27%;
 background:#163d6b;
 border-radius:15px;
 padding:15px;
-position:relative;   /* TAMBAHAN */
+position:relative;
 }
 
-/* FOTO POJOK KANAN BAWAH */
+/* FOTO PROMO */
 .promo-img{
 position:absolute;
 bottom:10px;
 right:10px;
-width:90px;
+width:95px;
+opacity:1;
+transition:opacity 0.8s ease;
+animation:glowPulse 2s infinite alternate;
 }
 
-.promo h2{
-text-align:center;
-color:#FFD700;
-letter-spacing:1px;
-margin-bottom:15px;
+/* Glow tipis hidup */
+@keyframes glowPulse{
+from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
+to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
 }
 
 .promo table{
@@ -321,9 +322,7 @@ cursor:pointer;">
 </tr>
 </table>
 
-<!-- TAMBAHAN FOTO -->
-<img src="promo.png" class="promo-img">
-
+<img src="promo1.png" class="promo-img" id="promoImage">
 </div>
 
 </div>
@@ -394,7 +393,6 @@ document.getElementById("displayB").innerText = nomor;
 }
 
 if(lastCalled[id]!==data.waktu){
-
 loketBox.classList.add("active-loket");
 document.getElementById(id).classList.add("blink");
 
@@ -422,10 +420,26 @@ now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"
 }
 setInterval(updateJam,1000);
 updateJam();
+
+/* AUTO GANTI GAMBAR PROMO */
+const promoImages=["promo1.png","promo2.png","promo3.png"];
+let promoIndex=0;
+const promoEl=document.getElementById("promoImage");
+
+setInterval(()=>{
+promoEl.style.opacity=0;
+setTimeout(()=>{
+promoIndex=(promoIndex+1)%promoImages.length;
+promoEl.src=promoImages[promoIndex];
+promoEl.style.opacity=1;
+},800);
+},5000);
+
 </script>
 
 </body>
 </html>
+
 
 
 
