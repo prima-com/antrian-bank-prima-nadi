@@ -129,7 +129,7 @@ from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
 to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
 }
 
-/* KHUSUS SLIDE PROMO2 */
+/* PROMO2 SLIDE */
 .slide-in{
 animation:slideFromLeft 2.5s ease forwards,
 glowPulse 2s infinite alternate;
@@ -143,6 +143,29 @@ opacity:0;
 to{
 transform:translateX(0);
 opacity:1;
+}
+}
+
+/* PROMO3 SLIDE JAUH + BOUNCE */
+.slide-in-far{
+animation:slideFromLeftFarBounce 3.2s cubic-bezier(.25,.8,.25,1) forwards,
+glowPulse 2s infinite alternate;
+}
+
+@keyframes slideFromLeftFarBounce{
+0%{
+transform:translateX(-300px);
+opacity:0;
+}
+70%{
+transform:translateX(15px);
+opacity:1;
+}
+85%{
+transform:translateX(-8px);
+}
+100%{
+transform:translateX(0);
 }
 }
 
@@ -285,13 +308,7 @@ z-index:9999;
 <body>
 
 <div id="unlock">
-<button onclick="aktifkanSuara()" style="
-font-size:30px;
-padding:20px 40px;
-background:gold;
-border:none;
-border-radius:15px;
-cursor:pointer;">
+<button onclick="aktifkanSuara()" style="font-size:30px;padding:20px 40px;background:gold;border:none;border-radius:15px;cursor:pointer;">
 🔊 AKTIFKAN SUARA
 </button>
 </div>
@@ -321,24 +338,11 @@ cursor:pointer;">
 
 <div class="promo">
 <table>
-<tr>
-<th>NOMINAL DEPOSITO</th>
-<th>RATE</th>
-</tr>
-<tr>
-<td>1 jt - ≤ 100 jt </td>
-<td>5,00 %</td>
-</tr>
-<tr>
-<td>100 jt keatas - < 500 jt</td>
-<td>5,25 %</td>
-</tr>
-<tr>
-<td>500 jt keatas</td>
-<td class="highlight-rate">5,50 %</td>
-</tr>
+<tr><th>NOMINAL DEPOSITO</th><th>RATE</th></tr>
+<tr><td>1 jt - ≤ 100 jt</td><td>5,00 %</td></tr>
+<tr><td>100 jt keatas - < 500 jt</td><td>5,25 %</td></tr>
+<tr><td>500 jt keatas</td><td class="highlight-rate">5,50 %</td></tr>
 </table>
-
 <img src="promo1.png" class="promo-img" id="promoImage">
 </div>
 
@@ -438,13 +442,13 @@ now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"
 setInterval(updateJam,1000);
 updateJam();
 
-/* AUTO ROTATE GAMBAR */
+/* AUTO ROTATE GAMBAR FINAL */
 const promoImages=["promo1.png","promo2.png","promo3.png"];
 let promoIndex=0;
 const promoEl=document.getElementById("promoImage");
 
 setInterval(()=>{
-promoEl.classList.remove("slide-in");
+promoEl.classList.remove("slide-in","slide-in-far");
 promoEl.style.opacity=0;
 
 setTimeout(()=>{
@@ -453,28 +457,21 @@ promoEl.src=promoImages[promoIndex];
 
 if(promoImages[promoIndex]==="promo2.png"){
 promoEl.classList.add("slide-in");
-}else{
+}
+else if(promoImages[promoIndex]==="promo3.png"){
+promoEl.classList.add("slide-in-far");
+}
+else{
 promoEl.style.opacity=1;
 }
+
 },800);
 
 },5000);
-
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
 
 
 
