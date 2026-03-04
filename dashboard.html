@@ -60,6 +60,12 @@ margin-top:20px;
 background:#00c853;
 color:white;
 }
+.rankingCard{
+background:#1d4c84;
+padding:10px;
+margin:6px;
+border-radius:8px;
+}
 </style>
 </head>
 <body>
@@ -101,6 +107,9 @@ color:white;
 <canvas id="chartAntrian" height="100"></canvas>
 
 <button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan Hari Ini</button>
+
+<h2>🏆 RANKING LOKET TERCEPAT HARI INI</h2>
+<div id="rankingBox"></div>
 
 <script>
 var firebaseConfig = {
@@ -274,15 +283,11 @@ datasets:[{label:'Jumlah',data:[0,0,0]}]
 options:{responsive:true,plugins:{legend:{display:false}}}
 });
 
-/* ========================= */
-/* ===== EXPORT FIXED ===== */
-/* ========================= */
-
+/* EXPORT */
 function exportExcel(){
 let today=new Date().toISOString().slice(0,10);
 
 db.ref("serviceLog/"+today).once("value",snap=>{
-
 if(snap.exists()){
 let csv="Nomor,Loket,Durasi (detik),Waktu Panggil,Waktu Selesai\n";
 snap.forEach(child=>{
@@ -318,9 +323,53 @@ a.download=filename;
 a.click();
 }
 
+/* RANKING */
+function loadRanking(){
+let today=new Date().toISOString().slice(0,10);
+
+db.ref("serviceLog/"+today).on("value",snap=>{
+if(!snap.exists()){
+document.getElementById("rankingBox").innerHTML="Belum ada layanan selesai hari ini";
+return;
+}
+
+let dataPerLoket={};
+
+snap.forEach(child=>{
+let d=child.val();
+if(!dataPerLoket[d.loket]){
+dataPerLoket[d.loket]={total:0,totalDurasi:0};
+}
+dataPerLoket[d.loket].total++;
+dataPerLoket[d.loket].totalDurasi+=d.durasi;
+});
+
+let ranking=[];
+for(let loket in dataPerLoket){
+let avg=dataPerLoket[loket].totalDurasi/dataPerLoket[loket].total;
+ranking.push({loket:loket,total:dataPerLoket[loket].total,avg:avg});
+}
+
+ranking.sort((a,b)=>a.avg-b.avg);
+
+let html="";
+ranking.forEach((r,i)=>{
+let medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
+html+=`<div class="rankingCard">${medal} <b>${r.loket.toUpperCase()}</b><br>
+Total Layanan: ${r.total}<br>
+Rata-rata: ${Math.round(r.avg)} detik</div>`;
+});
+
+document.getElementById("rankingBox").innerHTML=html;
+});
+}
+
+loadRanking();
+
 </script>
 </body>
 </html>
+
 
 
 
