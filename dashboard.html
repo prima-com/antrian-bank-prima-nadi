@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
 body{
@@ -183,7 +184,6 @@ db.ref("queue/"+prefix)
 .equalTo("waiting")
 .limitToFirst(1)
 .once("value",snap=>{
-
 if(!snap.exists()){
 alert("Tidak ada antrian");
 busyLoket[loket]=false;
@@ -290,18 +290,25 @@ datasets:[{label:'Jumlah',data:[0,0,0]}]
 options:{responsive:true,plugins:{legend:{display:false}}}
 });
 
-/* EXPORT */
+/* EXPORT XLSX */
 function exportExcel(){
 let today=new Date().toISOString().slice(0,10);
 
 db.ref("serviceLog/"+today).once("value",snap=>{
+let dataArray=[];
+
 if(snap.exists()){
-let csv="Nomor,Loket,Durasi (detik),Waktu Panggil,Waktu Selesai\n";
 snap.forEach(child=>{
 let d=child.val();
-csv+=`${d.nomor},${d.loket},${d.durasi},${new Date(d.waktuPanggil).toLocaleTimeString()},${new Date(d.waktuSelesai).toLocaleTimeString()}\n`;
+dataArray.push({
+"Nomor": d.nomor,
+"Loket": d.loket,
+"Durasi (detik)": d.durasi,
+"Waktu Panggil": new Date(d.waktuPanggil).toLocaleTimeString(),
+"Waktu Selesai": new Date(d.waktuSelesai).toLocaleTimeString()
 });
-downloadCSV(csv,"Laporan_Lengkap_"+today+".csv");
+});
+generateXLSX(dataArray,"Laporan_Lengkap_"+today+".xlsx");
 return;
 }
 
@@ -310,23 +317,25 @@ if(!histSnap.exists()){
 alert("Belum ada data sama sekali hari ini");
 return;
 }
-let csv="Nomor,Loket,Waktu Panggil\n";
+
 histSnap.forEach(child=>{
 let d=child.val();
-csv+=`${d.nomor},${d.loket},${new Date(d.waktu).toLocaleTimeString()}\n`;
+dataArray.push({
+"Nomor": d.nomor,
+"Loket": d.loket,
+"Waktu Panggil": new Date(d.waktu).toLocaleTimeString()
 });
-downloadCSV(csv,"Laporan_Panggilan_"+today+".csv");
+});
+generateXLSX(dataArray,"Laporan_Panggilan_"+today+".xlsx");
 });
 });
 }
 
-function downloadCSV(csv,filename){
-let blob=new Blob([csv],{type:"text/csv"});
-let url=URL.createObjectURL(blob);
-let a=document.createElement("a");
-a.href=url;
-a.download=filename;
-a.click();
+function generateXLSX(data,filename){
+let worksheet = XLSX.utils.json_to_sheet(data);
+let workbook = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
+XLSX.writeFile(workbook, filename);
 }
 
 /* RANKING */
@@ -340,7 +349,6 @@ return;
 }
 
 let dataPerLoket={};
-
 snap.forEach(child=>{
 let d=child.val();
 if(!dataPerLoket[d.loket]){
@@ -417,6 +425,7 @@ loadGrafikJam();
 </script>
 </body>
 </html>
+
 
 
 
