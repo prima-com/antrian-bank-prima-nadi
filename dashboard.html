@@ -103,7 +103,6 @@ color:white;
 <button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan Hari Ini</button>
 
 <script>
-
 var firebaseConfig = {
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
@@ -142,7 +141,6 @@ allowedLoket=["loket3","loket4"];
 }
 document.getElementById("operatorInfo").innerHTML=
 "<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
-
 hideUnauthorized();
 }
 
@@ -161,13 +159,12 @@ btn.style.display="none";
 }
 
 function panggil(loket){
-
 if(busyLoket[loket]) return;
 busyLoket[loket]=true;
 
-let prefixLoket=(loket==="loket1"||loket==="loket2")?"A":"B";
+let prefix=(loket==="loket1"||loket==="loket2")?"A":"B";
 
-db.ref("queue/"+prefixLoket)
+db.ref("queue/"+prefix)
 .orderByChild("status")
 .equalTo("waiting")
 .limitToFirst(1)
@@ -186,12 +183,10 @@ lastNomor[loket]=data.nomor;
 
 activeCallData[loket]={
 nomor:data.nomor,
-calledTime:Date.now(),
-key:key,
-prefix:prefixLoket
+calledTime:Date.now()
 };
 
-db.ref("queue/"+prefixLoket+"/"+key).update({
+db.ref("queue/"+prefix+"/"+key).update({
 status:"called",
 calledTime:Date.now(),
 loket:loket
@@ -205,8 +200,14 @@ waktu:Date.now()
 db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
 db.ref("stats/totalCalled").transaction(v=>(v||0)+1);
 
-setTimeout(()=>{ busyLoket[loket]=false; },1500);
+let today=new Date().toISOString().slice(0,10);
+db.ref("history/"+today).push({
+nomor:data.nomor,
+loket:loket,
+waktu:Date.now()
+});
 
+setTimeout(()=>{busyLoket[loket]=false;},1500);
 });
 }
 
@@ -216,7 +217,6 @@ if(!activeCallData[loket]) return;
 let data=activeCallData[loket];
 let selesaiTime=Date.now();
 let durasi=Math.floor((selesaiTime-data.calledTime)/1000);
-
 let today=new Date().toISOString().slice(0,10);
 
 db.ref("serviceLog/"+today).push({
@@ -274,30 +274,51 @@ datasets:[{label:'Jumlah',data:[0,0,0]}]
 options:{responsive:true,plugins:{legend:{display:false}}}
 });
 
+/* ========================= */
+/* ===== EXPORT FIXED ===== */
+/* ========================= */
+
 function exportExcel(){
 let today=new Date().toISOString().slice(0,10);
 
 db.ref("serviceLog/"+today).once("value",snap=>{
-if(!snap.exists()){alert("Belum ada data");return;}
 
+if(snap.exists()){
 let csv="Nomor,Loket,Durasi (detik),Waktu Panggil,Waktu Selesai\n";
-
 snap.forEach(child=>{
 let d=child.val();
 csv+=`${d.nomor},${d.loket},${d.durasi},${new Date(d.waktuPanggil).toLocaleTimeString()},${new Date(d.waktuSelesai).toLocaleTimeString()}\n`;
 });
+downloadCSV(csv,"Laporan_Lengkap_"+today+".csv");
+return;
+}
 
+db.ref("history/"+today).once("value",histSnap=>{
+if(!histSnap.exists()){
+alert("Belum ada data sama sekali hari ini");
+return;
+}
+
+let csv="Nomor,Loket,Waktu Panggil\n";
+histSnap.forEach(child=>{
+let d=child.val();
+csv+=`${d.nomor},${d.loket},${new Date(d.waktu).toLocaleTimeString()}\n`;
+});
+downloadCSV(csv,"Laporan_Panggilan_"+today+".csv");
+});
+});
+}
+
+function downloadCSV(csv,filename){
 let blob=new Blob([csv],{type:"text/csv"});
 let url=URL.createObjectURL(blob);
 let a=document.createElement("a");
 a.href=url;
-a.download="Laporan_Antrian_"+today+".csv";
+a.download=filename;
 a.click();
-});
 }
 
 </script>
-
 </body>
 </html>
 
