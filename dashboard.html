@@ -111,6 +111,9 @@ border-radius:8px;
 <h2>🏆 RANKING LOKET TERCEPAT HARI INI</h2>
 <div id="rankingBox"></div>
 
+<h2>📊 GRAFIK JAM SIBUK HARI INI</h2>
+<canvas id="chartJam" height="100"></canvas>
+
 <script>
 var firebaseConfig = {
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
@@ -128,6 +131,7 @@ let lastNomor={};
 let busyLoket={};
 let activeCallData={};
 
+/* LOGIN */
 function login(){
 const username=document.getElementById("username").value;
 const password=document.getElementById("password").value;
@@ -167,6 +171,7 @@ btn.style.display="none";
 });
 }
 
+/* PANGGIL */
 function panggil(loket){
 if(busyLoket[loket]) return;
 busyLoket[loket]=true;
@@ -220,6 +225,7 @@ setTimeout(()=>{busyLoket[loket]=false;},1500);
 });
 }
 
+/* SELESAI */
 function selesai(loket){
 if(!activeCallData[loket]) return;
 
@@ -253,6 +259,7 @@ waktu:Date.now()
 });
 }
 
+/* STATISTIK + GRAFIK UTAMA */
 db.ref("stats").on("value",snap=>{
 let s=snap.val();
 if(!s) return;
@@ -303,7 +310,6 @@ if(!histSnap.exists()){
 alert("Belum ada data sama sekali hari ini");
 return;
 }
-
 let csv="Nomor,Loket,Waktu Panggil\n";
 histSnap.forEach(child=>{
 let d=child.val();
@@ -363,8 +369,50 @@ Rata-rata: ${Math.round(r.avg)} detik</div>`;
 document.getElementById("rankingBox").innerHTML=html;
 });
 }
-
 loadRanking();
+
+/* GRAFIK JAM SIBUK */
+let ctxJam=document.getElementById('chartJam').getContext('2d');
+let chartJam=new Chart(ctxJam,{
+type:'line',
+data:{labels:[],datasets:[{label:'Jumlah Layanan',data:[],fill:false,tension:0.3}]},
+options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+function loadGrafikJam(){
+let today=new Date().toISOString().slice(0,10);
+
+db.ref("serviceLog/"+today).on("value",snap=>{
+if(!snap.exists()){
+chartJam.data.labels=[];
+chartJam.data.datasets[0].data=[];
+chartJam.update();
+return;
+}
+
+let jamData={};
+snap.forEach(child=>{
+let d=child.val();
+let jam=new Date(d.waktuSelesai).getHours();
+if(!jamData[jam]) jamData[jam]=0;
+jamData[jam]++;
+});
+
+let labels=[];
+let values=[];
+for(let i=0;i<24;i++){
+if(jamData[i]){
+labels.push(i.toString().padStart(2,'0')+":00");
+values.push(jamData[i]);
+}
+}
+
+chartJam.data.labels=labels;
+chartJam.data.datasets[0].data=values;
+chartJam.update();
+});
+}
+loadGrafikJam();
 
 </script>
 </body>
