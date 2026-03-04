@@ -6,8 +6,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<!-- TAMBAHAN CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -20,16 +18,16 @@ margin:0;
 padding:20px;
 }
 button{
-padding:12px 20px;
+padding:10px 18px;
 margin:5px;
-font-size:16px;
+font-size:15px;
 border:none;
 border-radius:6px;
 cursor:pointer;
 background:#FFD700;
 font-weight:bold;
 }
-button:hover{opacity:0.8;}
+button:hover{opacity:0.85;}
 .loginBox{
 position:fixed;
 inset:0;
@@ -57,6 +55,11 @@ border-radius:10px;
 padding:10px;
 margin-top:15px;
 }
+.exportBtn{
+margin-top:20px;
+background:#00c853;
+color:white;
+}
 </style>
 </head>
 <body>
@@ -75,24 +78,29 @@ margin-top:15px;
 
 <div>
 <button onclick="panggil('loket1')">Panggil Loket 1</button>
-<button onclick="ulang('loket1')">Ulang Loket 1</button><br>
+<button onclick="ulang('loket1')">Ulang</button>
+<button onclick="selesai('loket1')">Selesai</button><br>
 
 <button onclick="panggil('loket2')">Panggil Loket 2</button>
-<button onclick="ulang('loket2')">Ulang Loket 2</button><br>
+<button onclick="ulang('loket2')">Ulang</button>
+<button onclick="selesai('loket2')">Selesai</button><br>
 
 <button onclick="panggil('loket3')">Panggil Loket 3</button>
-<button onclick="ulang('loket3')">Ulang Loket 3</button><br>
+<button onclick="ulang('loket3')">Ulang</button>
+<button onclick="selesai('loket3')">Selesai</button><br>
 
 <button onclick="panggil('loket4')">Panggil Loket 4</button>
-<button onclick="ulang('loket4')">Ulang Loket 4</button>
+<button onclick="ulang('loket4')">Ulang</button>
+<button onclick="selesai('loket4')">Selesai</button>
 </div>
 
 <h2>STATISTIK HARI INI</h2>
 <div id="statsBox"></div>
 
-<!-- TAMBAHAN GRAFIK -->
-<h2>GRAFIK PERFORMA HARI INI</h2>
+<h2>GRAFIK PERFORMA</h2>
 <canvas id="chartAntrian" height="100"></canvas>
+
+<button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan Hari Ini</button>
 
 <script>
 
@@ -110,6 +118,7 @@ let role=null;
 let allowedLoket=[];
 let lastNomor={};
 let busyLoket={};
+let activeCallData={};
 
 function login(){
 const username=document.getElementById("username").value;
@@ -175,6 +184,13 @@ let data=snap.val()[key];
 
 lastNomor[loket]=data.nomor;
 
+activeCallData[loket]={
+nomor:data.nomor,
+calledTime:Date.now(),
+key:key,
+prefix:prefixLoket
+};
+
 db.ref("queue/"+prefixLoket+"/"+key).update({
 status:"called",
 calledTime:Date.now(),
@@ -189,18 +205,35 @@ waktu:Date.now()
 db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
 db.ref("stats/totalCalled").transaction(v=>(v||0)+1);
 
+setTimeout(()=>{ busyLoket[loket]=false; },1500);
+
+});
+}
+
+function selesai(loket){
+if(!activeCallData[loket]) return;
+
+let data=activeCallData[loket];
+let selesaiTime=Date.now();
+let durasi=Math.floor((selesaiTime-data.calledTime)/1000);
+
 let today=new Date().toISOString().slice(0,10);
-db.ref("history/"+today).push({
+
+db.ref("serviceLog/"+today).push({
 nomor:data.nomor,
 loket:loket,
-waktu:Date.now()
+durasi:durasi,
+waktuPanggil:data.calledTime,
+waktuSelesai:selesaiTime
 });
 
-setTimeout(()=>{
-busyLoket[loket]=false;
-},1500);
-
+db.ref("stats/avgServiceTime").transaction(v=>{
+if(!v) return durasi*1000;
+return (v + durasi*1000)/2;
 });
+
+delete activeCallData[loket];
+alert("Layanan selesai. Durasi: "+durasi+" detik");
 }
 
 function ulang(loket){
@@ -218,7 +251,8 @@ if(!s) return;
 document.getElementById("statsBox").innerHTML=
 "Total Antrian: "+(s.totalToday||0)+"<br>"+
 "Sudah Dipanggil: "+(s.totalCalled||0)+"<br>"+
-"Sisa Menunggu: "+(s.totalWaiting||0);
+"Sisa Menunggu: "+(s.totalWaiting||0)+"<br>"+
+"Rata-rata Layanan: "+Math.round((s.avgServiceTime||0)/1000)+" detik";
 
 if(chart){
 chart.data.datasets[0].data=[
@@ -230,28 +264,37 @@ chart.update();
 }
 });
 
-/* ========================= */
-/* ===== GRAFIK PRO MAX ==== */
-/* ========================= */
-
 let ctx=document.getElementById('chartAntrian').getContext('2d');
-
 let chart=new Chart(ctx,{
 type:'bar',
 data:{
 labels:['Total','Dipanggil','Menunggu'],
-datasets:[{
-label:'Jumlah',
-data:[0,0,0]
-}]
+datasets:[{label:'Jumlah',data:[0,0,0]}]
 },
-options:{
-responsive:true,
-plugins:{
-legend:{display:false}
-}
-}
+options:{responsive:true,plugins:{legend:{display:false}}}
 });
+
+function exportExcel(){
+let today=new Date().toISOString().slice(0,10);
+
+db.ref("serviceLog/"+today).once("value",snap=>{
+if(!snap.exists()){alert("Belum ada data");return;}
+
+let csv="Nomor,Loket,Durasi (detik),Waktu Panggil,Waktu Selesai\n";
+
+snap.forEach(child=>{
+let d=child.val();
+csv+=`${d.nomor},${d.loket},${d.durasi},${new Date(d.waktuPanggil).toLocaleTimeString()},${new Date(d.waktuSelesai).toLocaleTimeString()}\n`;
+});
+
+let blob=new Blob([csv],{type:"text/csv"});
+let url=URL.createObjectURL(blob);
+let a=document.createElement("a");
+a.href=url;
+a.download="Laporan_Antrian_"+today+".csv";
+a.click();
+});
+}
 
 </script>
 
