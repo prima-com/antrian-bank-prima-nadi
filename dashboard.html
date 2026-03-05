@@ -13,11 +13,11 @@
 
 body{
 font-family:Arial;
-background:#0e2f5a;
+background:#153a63;
 color:white;
-text-align:center;
 margin:0;
 padding:20px;
+text-align:center;
 }
 
 /* LOGIN */
@@ -25,7 +25,7 @@ padding:20px;
 .loginBox{
 position:fixed;
 inset:0;
-background:#0e2f5a;
+background:#153a63;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -58,12 +58,12 @@ button:hover{
 opacity:0.85;
 }
 
-/* LOKET LAYOUT */
+/* LOKET AREA */
 
 .loketWrapper{
 display:flex;
 justify-content:space-between;
-margin-top:20px;
+margin-top:30px;
 gap:20px;
 }
 
@@ -72,7 +72,7 @@ width:50%;
 }
 
 .loketCard{
-background:#133b72;
+background:#1e4c82;
 padding:20px;
 border-radius:12px;
 margin-bottom:20px;
@@ -85,16 +85,16 @@ font-weight:bold;
 margin-bottom:10px;
 }
 
-/* STATISTIK */
+/* DASHBOARD CENTER */
 
-#statsBox{
-margin-top:20px;
-font-size:18px;
+.dashboardCenter{
+width:700px;
+margin:40px auto;
 }
 
-/* CHART */
-
 canvas{
+width:100% !important;
+height:auto !important;
 background:white;
 border-radius:10px;
 padding:10px;
@@ -104,10 +104,11 @@ margin-top:20px;
 /* EXPORT */
 
 .exportBtn{
-margin-top:20px;
 background:#00c853;
 color:white;
 width:250px;
+display:block;
+margin:20px auto;
 }
 
 /* RANKING */
@@ -139,6 +140,7 @@ border-radius:8px;
 </div>
 </div>
 
+
 <h1>DASHBOARD OPERATOR</h1>
 
 <div id="operatorInfo"></div>
@@ -147,8 +149,6 @@ border-radius:8px;
 <!-- LOKET -->
 
 <div class="loketWrapper">
-
-<!-- KIRI -->
 
 <div class="loketColumn">
 
@@ -168,8 +168,6 @@ border-radius:8px;
 
 </div>
 
-
-<!-- KANAN -->
 
 <div class="loketColumn">
 
@@ -192,38 +190,29 @@ border-radius:8px;
 </div>
 
 
-<!-- STATISTIK -->
+<!-- DASHBOARD DATA -->
+
+<div class="dashboardCenter">
 
 <h2>STATISTIK HARI INI</h2>
 
 <div id="statsBox"></div>
 
-
-<!-- GRAFIK -->
-
 <h2>GRAFIK PERFORMA</h2>
 
-<canvas id="chartAntrian" height="100"></canvas>
-
-
-<!-- EXPORT -->
+<canvas id="chartAntrian"></canvas>
 
 <button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan XLSX</button>
-
-
-<!-- RANKING -->
 
 <h2>🏆 RANKING LOKET TERCEPAT</h2>
 
 <div id="rankingBox"></div>
 
-
-<!-- JAM SIBUK -->
-
 <h2>📊 GRAFIK JAM SIBUK</h2>
 
-<canvas id="chartJam" height="100"></canvas>
+<canvas id="chartJam"></canvas>
 
+</div>
 
 
 <script>
@@ -231,10 +220,12 @@ border-radius:8px;
 /* FIREBASE */
 
 var firebaseConfig = {
+
 apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
 projectId: "antrian-bank-prima-nadi"
+
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -322,7 +313,6 @@ btn.style.display="none"
 }
 
 
-
 /* PANGGIL */
 
 function panggil(loket){
@@ -372,9 +362,23 @@ waktu:Date.now()
 
 })
 
-setTimeout(()=>{
-busyLoket[loket]=false
-},1500)
+setTimeout(()=>{busyLoket[loket]=false},1500)
+
+})
+
+}
+
+
+/* ULANG */
+
+function ulang(loket){
+
+if(!lastNomor[loket]) return
+
+db.ref("loket/"+loket).set({
+
+nomor:lastNomor[loket],
+waktu:Date.now()
 
 })
 
@@ -408,22 +412,6 @@ waktuSelesai:selesaiTime
 delete activeCallData[loket]
 
 alert("Durasi layanan "+durasi+" detik")
-
-}
-
-
-/* ULANG */
-
-function ulang(loket){
-
-if(!lastNomor[loket]) return
-
-db.ref("loket/"+loket).set({
-
-nomor:lastNomor[loket],
-waktu:Date.now()
-
-})
 
 }
 
@@ -468,6 +456,7 @@ XLSX.writeFile(wb,"laporan_"+today+".xlsx")
 
 </body>
 </html>
+
 
 
 
