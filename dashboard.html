@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Operator Enterprise MAX</title>
+<title>Dashboard Operator</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
+
 body{
 font-family:Arial;
 background:#0e2f5a;
@@ -18,17 +19,9 @@ text-align:center;
 margin:0;
 padding:20px;
 }
-button{
-padding:10px 18px;
-margin:5px;
-font-size:15px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:#FFD700;
-font-weight:bold;
-}
-button:hover{opacity:0.85;}
+
+/* LOGIN */
+
 .loginBox{
 position:fixed;
 inset:0;
@@ -38,393 +31,446 @@ justify-content:center;
 align-items:center;
 z-index:9999;
 }
+
 .loginContent{
 background:white;
 padding:30px;
 border-radius:10px;
 width:300px;
-text-align:center;
 color:black;
 }
+
+/* BUTTON */
+
+button{
+padding:12px;
+margin:6px 0;
+font-size:14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#FFD700;
+font-weight:bold;
+width:100%;
+}
+
+button:hover{
+opacity:0.85;
+}
+
+/* LOKET LAYOUT */
+
+.loketWrapper{
+display:flex;
+justify-content:space-between;
+margin-top:20px;
+gap:20px;
+}
+
+.loketColumn{
+width:50%;
+}
+
+.loketCard{
+background:#133b72;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 8px 18px rgba(0,0,0,0.3);
+}
+
+.loketTitle{
+font-size:20px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+/* STATISTIK */
+
 #statsBox{
 margin-top:20px;
 font-size:18px;
 }
+
+/* CHART */
+
 canvas{
 background:white;
 border-radius:10px;
 padding:10px;
-margin-top:15px;
+margin-top:20px;
 }
+
+/* EXPORT */
+
 .exportBtn{
 margin-top:20px;
 background:#00c853;
 color:white;
+width:250px;
 }
+
+/* RANKING */
+
 .rankingCard{
 background:#1d4c84;
-padding:10px;
+padding:12px;
 margin:6px;
 border-radius:8px;
 }
+
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
+
 <div class="loginBox" id="loginBox">
 <div class="loginContent">
+
 <h3>Login Operator</h3>
-<input type="text" id="username" placeholder="Username" style="width:100%;padding:10px;margin-bottom:10px;">
-<input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px;">
+
+<input id="username" placeholder="Username" style="width:100%;padding:10px;margin-bottom:10px">
+
+<input id="password" type="password" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px">
+
 <button onclick="login()">Masuk</button>
+
 </div>
 </div>
 
 <h1>DASHBOARD OPERATOR</h1>
+
 <div id="operatorInfo"></div>
 
-<div>
-<button onclick="panggil('loket1')">Panggil Loket 1</button>
+
+<!-- LOKET -->
+
+<div class="loketWrapper">
+
+<!-- KIRI -->
+
+<div class="loketColumn">
+
+<div class="loketCard">
+<div class="loketTitle">Loket 1</div>
+<button onclick="panggil('loket1')">Panggil</button>
 <button onclick="ulang('loket1')">Ulang</button>
-<button onclick="selesai('loket1')">Selesai</button><br>
+<button onclick="selesai('loket1')">Selesai</button>
+</div>
 
-<button onclick="panggil('loket2')">Panggil Loket 2</button>
-<button onclick="ulang('loket2')">Ulang</button>
-<button onclick="selesai('loket2')">Selesai</button><br>
-
-<button onclick="panggil('loket3')">Panggil Loket 3</button>
+<div class="loketCard">
+<div class="loketTitle">Loket 3</div>
+<button onclick="panggil('loket3')">Panggil</button>
 <button onclick="ulang('loket3')">Ulang</button>
-<button onclick="selesai('loket3')">Selesai</button><br>
+<button onclick="selesai('loket3')">Selesai</button>
+</div>
 
-<button onclick="panggil('loket4')">Panggil Loket 4</button>
+</div>
+
+
+<!-- KANAN -->
+
+<div class="loketColumn">
+
+<div class="loketCard">
+<div class="loketTitle">Loket 2</div>
+<button onclick="panggil('loket2')">Panggil</button>
+<button onclick="ulang('loket2')">Ulang</button>
+<button onclick="selesai('loket2')">Selesai</button>
+</div>
+
+<div class="loketCard">
+<div class="loketTitle">Loket 4</div>
+<button onclick="panggil('loket4')">Panggil</button>
 <button onclick="ulang('loket4')">Ulang</button>
 <button onclick="selesai('loket4')">Selesai</button>
 </div>
 
+</div>
+
+</div>
+
+
+<!-- STATISTIK -->
+
 <h2>STATISTIK HARI INI</h2>
+
 <div id="statsBox"></div>
 
+
+<!-- GRAFIK -->
+
 <h2>GRAFIK PERFORMA</h2>
+
 <canvas id="chartAntrian" height="100"></canvas>
 
-<button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan Hari Ini</button>
 
-<h2>🏆 RANKING LOKET TERCEPAT HARI INI</h2>
+<!-- EXPORT -->
+
+<button class="exportBtn" onclick="exportExcel()">⬇ Download Laporan XLSX</button>
+
+
+<!-- RANKING -->
+
+<h2>🏆 RANKING LOKET TERCEPAT</h2>
+
 <div id="rankingBox"></div>
 
-<h2>📊 GRAFIK JAM SIBUK HARI INI</h2>
+
+<!-- JAM SIBUK -->
+
+<h2>📊 GRAFIK JAM SIBUK</h2>
+
 <canvas id="chartJam" height="100"></canvas>
 
+
+
 <script>
+
+/* FIREBASE */
+
 var firebaseConfig = {
-apiKey: "AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
-authDomain: "antrian-bank-prima-nadi.firebaseapp.com",
-databaseURL: "https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
-projectId: "antrian-bank-prima-nadi"
+
+apiKey: "APIKEY",
+authDomain: "PROJECT.firebaseapp.com",
+databaseURL: "DATABASEURL",
+projectId: "PROJECTID"
+
 };
 
 firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
 
-let role=null;
-let allowedLoket=[];
-let lastNomor={};
-let busyLoket={};
-let activeCallData={};
+var db=firebase.database();
+
+
+let role=null
+let allowedLoket=[]
+let lastNomor={}
+let busyLoket={}
+let activeCallData={}
+
 
 /* LOGIN */
+
 function login(){
-const username=document.getElementById("username").value;
-const password=document.getElementById("password").value;
+
+const username=document.getElementById("username").value
+const password=document.getElementById("password").value
 
 db.ref("users/"+username).once("value",snap=>{
-if(!snap.exists()){alert("User tidak ditemukan");return;}
-const data=snap.val();
-if(data.password!==password){alert("Password salah");return;}
-role=data.role;
-document.getElementById("loginBox").style.display="none";
-initRole();
-});
+
+if(!snap.exists()){
+alert("User tidak ditemukan")
+return
 }
+
+const data=snap.val()
+
+if(data.password!==password){
+alert("Password salah")
+return
+}
+
+role=data.role
+
+document.getElementById("loginBox").style.display="none"
+
+initRole()
+
+})
+
+}
+
 
 function initRole(){
+
 if(role==="cs"){
-allowedLoket=["loket1","loket2"];
+allowedLoket=["loket1","loket2"]
 }else{
-allowedLoket=["loket3","loket4"];
+allowedLoket=["loket3","loket4"]
 }
+
 document.getElementById("operatorInfo").innerHTML=
-"<h3>Login sebagai: "+role.toUpperCase()+"</h3>";
-hideUnauthorized();
+"<h3>Login sebagai "+role.toUpperCase()+"</h3>"
+
+hideUnauthorized()
+
 }
+
 
 function hideUnauthorized(){
+
 document.querySelectorAll("button").forEach(btn=>{
-const oc=btn.getAttribute("onclick");
+
+const oc=btn.getAttribute("onclick")
+
 if(oc){
-const match=oc.match(/'(loket\d+)'/);
+
+const match=oc.match(/'(loket\d+)'/)
+
 if(match){
+
 if(!allowedLoket.includes(match[1])){
-btn.style.display="none";
+btn.style.display="none"
 }
+
 }
+
 }
-});
+
+})
+
 }
+
+
 
 /* PANGGIL */
-function panggil(loket){
-if(busyLoket[loket]) return;
-busyLoket[loket]=true;
 
-let prefix=(loket==="loket1"||loket==="loket2")?"A":"B";
+function panggil(loket){
+
+if(busyLoket[loket]) return
+
+busyLoket[loket]=true
+
+let prefix=(loket==="loket1"||loket==="loket2")?"A":"B"
 
 db.ref("queue/"+prefix)
 .orderByChild("status")
 .equalTo("waiting")
 .limitToFirst(1)
 .once("value",snap=>{
+
 if(!snap.exists()){
-alert("Tidak ada antrian");
-busyLoket[loket]=false;
-return;
+alert("Tidak ada antrian")
+busyLoket[loket]=false
+return
 }
 
-let key=Object.keys(snap.val())[0];
-let data=snap.val()[key];
+let key=Object.keys(snap.val())[0]
+let data=snap.val()[key]
 
-lastNomor[loket]=data.nomor;
+lastNomor[loket]=data.nomor
 
 activeCallData[loket]={
+
 nomor:data.nomor,
 calledTime:Date.now()
-};
+
+}
 
 db.ref("queue/"+prefix+"/"+key).update({
+
 status:"called",
 calledTime:Date.now(),
 loket:loket
-});
+
+})
 
 db.ref("loket/"+loket).set({
+
 nomor:data.nomor,
 waktu:Date.now()
-});
 
-db.ref("stats/totalWaiting").transaction(v=>(v||1)-1);
-db.ref("stats/totalCalled").transaction(v=>(v||0)+1);
+})
 
-let today=new Date().toISOString().slice(0,10);
-db.ref("history/"+today).push({
-nomor:data.nomor,
-loket:loket,
-waktu:Date.now()
-});
+setTimeout(()=>{
+busyLoket[loket]=false
+},1500)
 
-setTimeout(()=>{busyLoket[loket]=false;},1500);
-});
+})
+
 }
 
-/* SELESAI */
-function selesai(loket){
-if(!activeCallData[loket]) return;
 
-let data=activeCallData[loket];
-let selesaiTime=Date.now();
-let durasi=Math.floor((selesaiTime-data.calledTime)/1000);
-let today=new Date().toISOString().slice(0,10);
+/* SELESAI */
+
+function selesai(loket){
+
+if(!activeCallData[loket]) return
+
+let data=activeCallData[loket]
+
+let selesaiTime=Date.now()
+
+let durasi=Math.floor((selesaiTime-data.calledTime)/1000)
+
+let today=new Date().toISOString().slice(0,10)
 
 db.ref("serviceLog/"+today).push({
+
 nomor:data.nomor,
 loket:loket,
 durasi:durasi,
 waktuPanggil:data.calledTime,
 waktuSelesai:selesaiTime
-});
 
-db.ref("stats/avgServiceTime").transaction(v=>{
-if(!v) return durasi*1000;
-return (v + durasi*1000)/2;
-});
+})
 
-delete activeCallData[loket];
-alert("Layanan selesai. Durasi: "+durasi+" detik");
+delete activeCallData[loket]
+
+alert("Durasi layanan "+durasi+" detik")
+
 }
+
+
+/* ULANG */
 
 function ulang(loket){
-if(!lastNomor[loket]) return;
+
+if(!lastNomor[loket]) return
+
 db.ref("loket/"+loket).set({
+
 nomor:lastNomor[loket],
 waktu:Date.now()
-});
+
+})
+
 }
 
-/* STATISTIK + GRAFIK UTAMA */
-db.ref("stats").on("value",snap=>{
-let s=snap.val();
-if(!s) return;
-
-document.getElementById("statsBox").innerHTML=
-"Total Antrian: "+(s.totalToday||0)+"<br>"+
-"Sudah Dipanggil: "+(s.totalCalled||0)+"<br>"+
-"Sisa Menunggu: "+(s.totalWaiting||0)+"<br>"+
-"Rata-rata Layanan: "+Math.round((s.avgServiceTime||0)/1000)+" detik";
-
-if(chart){
-chart.data.datasets[0].data=[
-s.totalToday||0,
-s.totalCalled||0,
-s.totalWaiting||0
-];
-chart.update();
-}
-});
-
-let ctx=document.getElementById('chartAntrian').getContext('2d');
-let chart=new Chart(ctx,{
-type:'bar',
-data:{
-labels:['Total','Dipanggil','Menunggu'],
-datasets:[{label:'Jumlah',data:[0,0,0]}]
-},
-options:{responsive:true,plugins:{legend:{display:false}}}
-});
 
 /* EXPORT XLSX */
+
 function exportExcel(){
-let today=new Date().toISOString().slice(0,10);
+
+let today=new Date().toISOString().slice(0,10)
 
 db.ref("serviceLog/"+today).once("value",snap=>{
-let dataArray=[];
 
-if(snap.exists()){
+let dataArray=[]
+
 snap.forEach(child=>{
-let d=child.val();
+
+let d=child.val()
+
 dataArray.push({
-"Nomor": d.nomor,
-"Loket": d.loket,
-"Durasi (detik)": d.durasi,
-"Waktu Panggil": new Date(d.waktuPanggil).toLocaleTimeString(),
-"Waktu Selesai": new Date(d.waktuSelesai).toLocaleTimeString()
-});
-});
-generateXLSX(dataArray,"Laporan_Lengkap_"+today+".xlsx");
-return;
+
+Nomor:d.nomor,
+Loket:d.loket,
+Durasi:d.durasi
+
+})
+
+})
+
+let ws=XLSX.utils.json_to_sheet(dataArray)
+
+let wb=XLSX.utils.book_new()
+
+XLSX.utils.book_append_sheet(wb,ws,"Laporan")
+
+XLSX.writeFile(wb,"laporan_"+today+".xlsx")
+
+})
+
 }
-
-db.ref("history/"+today).once("value",histSnap=>{
-if(!histSnap.exists()){
-alert("Belum ada data sama sekali hari ini");
-return;
-}
-
-histSnap.forEach(child=>{
-let d=child.val();
-dataArray.push({
-"Nomor": d.nomor,
-"Loket": d.loket,
-"Waktu Panggil": new Date(d.waktu).toLocaleTimeString()
-});
-});
-generateXLSX(dataArray,"Laporan_Panggilan_"+today+".xlsx");
-});
-});
-}
-
-function generateXLSX(data,filename){
-let worksheet = XLSX.utils.json_to_sheet(data);
-let workbook = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
-XLSX.writeFile(workbook, filename);
-}
-
-/* RANKING */
-function loadRanking(){
-let today=new Date().toISOString().slice(0,10);
-
-db.ref("serviceLog/"+today).on("value",snap=>{
-if(!snap.exists()){
-document.getElementById("rankingBox").innerHTML="Belum ada layanan selesai hari ini";
-return;
-}
-
-let dataPerLoket={};
-snap.forEach(child=>{
-let d=child.val();
-if(!dataPerLoket[d.loket]){
-dataPerLoket[d.loket]={total:0,totalDurasi:0};
-}
-dataPerLoket[d.loket].total++;
-dataPerLoket[d.loket].totalDurasi+=d.durasi;
-});
-
-let ranking=[];
-for(let loket in dataPerLoket){
-let avg=dataPerLoket[loket].totalDurasi/dataPerLoket[loket].total;
-ranking.push({loket:loket,total:dataPerLoket[loket].total,avg:avg});
-}
-
-ranking.sort((a,b)=>a.avg-b.avg);
-
-let html="";
-ranking.forEach((r,i)=>{
-let medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
-html+=`<div class="rankingCard">${medal} <b>${r.loket.toUpperCase()}</b><br>
-Total Layanan: ${r.total}<br>
-Rata-rata: ${Math.round(r.avg)} detik</div>`;
-});
-
-document.getElementById("rankingBox").innerHTML=html;
-});
-}
-loadRanking();
-
-/* GRAFIK JAM SIBUK */
-let ctxJam=document.getElementById('chartJam').getContext('2d');
-let chartJam=new Chart(ctxJam,{
-type:'line',
-data:{labels:[],datasets:[{label:'Jumlah Layanan',data:[],fill:false,tension:0.3}]},
-options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-});
-
-function loadGrafikJam(){
-let today=new Date().toISOString().slice(0,10);
-
-db.ref("serviceLog/"+today).on("value",snap=>{
-if(!snap.exists()){
-chartJam.data.labels=[];
-chartJam.data.datasets[0].data=[];
-chartJam.update();
-return;
-}
-
-let jamData={};
-snap.forEach(child=>{
-let d=child.val();
-let jam=new Date(d.waktuSelesai).getHours();
-if(!jamData[jam]) jamData[jam]=0;
-jamData[jam]++;
-});
-
-let labels=[];
-let values=[];
-for(let i=0;i<24;i++){
-if(jamData[i]){
-labels.push(i.toString().padStart(2,'0')+":00");
-values.push(jamData[i]);
-}
-}
-
-chartJam.data.labels=labels;
-chartJam.data.datasets[0].data=values;
-chartJam.update();
-});
-}
-loadGrafikJam();
 
 </script>
+
 </body>
 </html>
+
 
 
 
