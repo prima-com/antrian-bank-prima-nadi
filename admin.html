@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ADMIN CONTROL CENTER - ANTRIAN</title>
+<title>ADMIN SUPER CONTROL CENTER - ANTRIAN</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{font-family:Arial;margin:0;background:#0e2f5a;color:white}
@@ -26,19 +26,13 @@ th{background:#274f87}
 .loket span{font-size:28px;color:gold;font-weight:bold}
 .statGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
 .statItem{background:#163d6b;padding:15px;border-radius:8px;text-align:center}
-.statItem h3{margin:0 0 10px 0}
 .statItem span{font-size:26px;color:#FFD700;font-weight:bold}
 .loginBox{position:fixed;inset:0;background:#0e2f5a;display:flex;justify-content:center;align-items:center;z-index:9999}
 .loginContent{background:white;color:black;padding:30px;border-radius:10px;width:300px;text-align:center}
 .loginContent input{width:100%;margin-bottom:10px}
-.systemRow{margin:6px 0}
 .logoutBtn{background:#ff9800;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:bold}
-.queueBox{max-height:400px;overflow:auto}
-.actionBtn{padding:6px 10px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
-.callBtn{background:#4caf50;color:white}
-.skipBtn{background:#ff9800;color:white}
-.delBtn{background:#f44336;color:white}
-.exportBtn{background:#00c853;color:white;padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.callBtn{background:#4CAF50;border:none;color:white;padding:6px 10px;border-radius:6px;cursor:pointer}
+.delBtn{background:#ff5252;border:none;color:white;padding:6px 10px;border-radius:6px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -53,7 +47,7 @@ th{background:#274f87}
 </div>
 
 <div class="header">
-<div>ADMIN CONTROL CENTER</div>
+<div>ADMIN SUPER CONTROL CENTER</div>
 <div id="adminInfo"></div>
 </div>
 
@@ -65,27 +59,26 @@ th{background:#274f87}
 <button onclick="show('queue')">Manajemen Antrian</button>
 <button onclick="show('users')">User Operator</button>
 <button onclick="show('display')">TV Display</button>
-<button onclick="show('report')">Laporan</button>
+<button onclick="show('analytics')">Statistik Grafik</button>
 <button onclick="show('system')">System Info</button>
+<button onclick="show('backup')">Backup Data</button>
 <button onclick="show('reset')">Reset Sistem</button>
 </div>
 
 <div class="content">
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="page">
 <div class="card">
 <h2>Statistik Sistem Hari Ini</h2>
 <div class="statGrid">
-<div class="statItem"><h3>Total Antrian</h3><span id="sTotal">0</span></div>
-<div class="statItem"><h3>Sudah Dipanggil</h3><span id="sCalled">0</span></div>
-<div class="statItem"><h3>Menunggu</h3><span id="sWaiting">0</span></div>
-<div class="statItem"><h3>Rata Layanan</h3><span id="sAvg">0</span></div>
+<div class="statItem">Total Antrian<br><span id="sTotal">0</span></div>
+<div class="statItem">Sudah Dipanggil<br><span id="sCalled">0</span></div>
+<div class="statItem">Menunggu<br><span id="sWaiting">0</span></div>
+<div class="statItem">Rata Layanan<br><span id="sAvg">0</span></div>
 </div>
 </div>
 </div>
 
-<!-- MONITOR -->
 <div id="monitor" class="page" style="display:none">
 <div class="card">
 <h2>Monitoring Loket Real-Time</h2>
@@ -96,21 +89,11 @@ th{background:#274f87}
 <div class="loket">LOKET 4<br><span id="m4">-</span></div>
 </div>
 </div>
-
-<div class="card">
-<h2>Antrian Menunggu</h2>
-<div class="statGrid">
-<div class="statItem"><h3>CS (A)</h3><span id="waitingA">0</span></div>
-<div class="statItem"><h3>TELLER (B)</h3><span id="waitingB">0</span></div>
-</div>
-</div>
 </div>
 
-<!-- QUEUE MANAGER -->
 <div id="queue" class="page" style="display:none">
 <div class="card">
-<h2>Manajemen Antrian Real-Time</h2>
-<div class="queueBox">
+<h2>Manajemen Antrian Live</h2>
 <table>
 <thead>
 <tr>
@@ -124,9 +107,7 @@ th{background:#274f87}
 </table>
 </div>
 </div>
-</div>
 
-<!-- USERS -->
 <div id="users" class="page" style="display:none">
 <div class="card">
 <h2>Tambah Operator</h2>
@@ -154,7 +135,6 @@ th{background:#274f87}
 </div>
 </div>
 
-<!-- DISPLAY -->
 <div id="display" class="page" style="display:none">
 <div class="card">
 <h2>Running Text TV</h2>
@@ -169,15 +149,13 @@ th{background:#274f87}
 </div>
 </div>
 
-<!-- REPORT -->
-<div id="report" class="page" style="display:none">
+<div id="analytics" class="page" style="display:none">
 <div class="card">
-<h2>Export Laporan Hari Ini</h2>
-<button class="exportBtn" onclick="exportToday()">Download Excel</button>
+<h2>Grafik Layanan</h2>
+<canvas id="chart"></canvas>
 </div>
 </div>
 
-<!-- SYSTEM INFO -->
 <div id="system" class="page" style="display:none">
 <div class="card">
 <h2>Status Sistem</h2>
@@ -185,11 +163,16 @@ th{background:#274f87}
 </div>
 </div>
 
-<!-- RESET -->
+<div id="backup" class="page" style="display:none">
+<div class="card">
+<h2>Backup Database</h2>
+<button onclick="backupData()">Download Backup JSON</button>
+</div>
+</div>
+
 <div id="reset" class="page" style="display:none">
 <div class="card">
 <h2>Reset Sistem Antrian</h2>
-<p>Fungsi ini akan menghapus semua antrian yang sedang berjalan.</p>
 <button class="resetBtn" onclick="resetSystem()">RESET SEMUA ANTRIAN</button>
 </div>
 </div>
@@ -205,12 +188,12 @@ authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
 projectId:"antrian-bank-prima-nadi"
 };
+
 firebase.initializeApp(firebaseConfig);
 var db=firebase.database();
 
 let adminUser=null;
 
-/* LOGIN */
 function loginAdmin(){
 const u=document.getElementById('adminUser').value;
 const p=document.getElementById('adminPass').value;
@@ -220,9 +203,7 @@ adminUser=u;
 document.getElementById('loginBox').style.display='none';
 document.getElementById('adminInfo').innerHTML='Login: '+u+' <button class="logoutBtn" onclick="logout()">Logout</button>';
 }
-else{
-alert('Login gagal');
-}
+else alert('Login gagal');
 }
 
 function logout(){location.reload();}
@@ -232,7 +213,8 @@ document.querySelectorAll('.page').forEach(p=>p.style.display='none');
 document.getElementById(id).style.display='block';
 }
 
-/* STATISTIK */
+/* STAT */
+
 db.ref('stats').on('value',snap=>{
 let s=snap.val();
 if(!s) return;
@@ -243,72 +225,53 @@ document.getElementById('sWaiting').innerText=s.totalWaiting||0;
 document.getElementById('sAvg').innerText=Math.round((s.avgServiceTime||0)/1000)+'s';
 });
 
-/* WAITING COUNT */
-function countWaiting(prefix,el){
- db.ref('queue/'+prefix).orderByChild('status').equalTo('waiting').on('value',snap=>{
- let count=0;
- snap.forEach(()=>{count++;});
- document.getElementById(el).innerText=count;
- });
-}
-
-countWaiting('A','waitingA');
-countWaiting('B','waitingB');
-
 /* QUEUE MANAGER */
-function loadQueue(){
 
-let refA=db.ref('queue/A');
-let refB=db.ref('queue/B');
-
-function render(){
-
-Promise.all([
-refA.once('value'),
-refB.once('value')
-]).then(res=>{
-
+db.ref('queue').on('value',snap=>{
 let html='';
 
-res.forEach(snap=>{
-if(!snap.exists()) return;
+snap.forEach(type=>{
 
-snap.forEach(child=>{
-let d=child.val();
+ type.forEach(q=>{
+ let d=q.val();
 
-html+=`<tr>
-<td>${d.nomor}</td>
-<td>${d.status}</td>
-<td>${d.loket||'-'}</td>
-<td>
-<button class="actionBtn delBtn" onclick="deleteQueue('${snap.key}','${child.key}')">Hapus</button>
-</td>
-</tr>`;
+ html+=`<tr>
+ <td>${d.nomor}</td>
+ <td>${d.status}</td>
+ <td>${d.loket||'-'}</td>
+ <td>
+ <button class="callBtn" onclick="callQueue('${type.key}','${q.key}')">Panggil</button>
+ <button class="delBtn" onclick="delQueue('${type.key}','${q.key}')">Hapus</button>
+ </td>
+ </tr>`;
 
-});
-
-});
-
-document.getElementById('queueTable').innerHTML=html;
+ });
 
 });
 
+ document.getElementById('queueTable').innerHTML=html;
+
+});
+
+function delQueue(t,id){
+if(confirm('Hapus nomor ini?')){
+ db.ref('queue/'+t+'/'+id).remove();
+}
 }
 
-refA.on('value',render);
-refB.on('value',render);
+function callQueue(t,id){
+
+let loket=prompt('Panggil ke loket berapa?');
+
+if(!loket) return;
+
+ db.ref('queue/'+t+'/'+id).update({status:'called',loket:'loket'+loket});
+ db.ref('loket/loket'+loket).set({nomor:id});
 
 }
-
-function deleteQueue(prefix,id){
-if(!confirm('Hapus antrian ini?')) return;
-
-db.ref('queue/'+prefix+'/'+id).remove();
-}
-
-loadQueue();
 
 /* USERS */
+
 function addUser(){
 let u=document.getElementById('uName').value;
 let p=document.getElementById('uPass').value;
@@ -340,7 +303,7 @@ html+=`<tr>
 
 });
 
-document.getElementById('userTable').innerHTML=html;
+ document.getElementById('userTable').innerHTML=html;
 
 });
 
@@ -348,32 +311,22 @@ document.getElementById('userTable').innerHTML=html;
 
 function delUser(u){
 if(confirm('Hapus user '+u+' ?')){
-
-if(u==='admin'){
-alert('Admin utama tidak bisa dihapus');
-return;
-}
-
-db.ref('users/'+u).remove();
-
+if(u==='admin'){alert('Admin utama tidak bisa dihapus');return}
+ db.ref('users/'+u).remove();
 }
 }
 
 loadUsers();
 
 /* DISPLAY */
+
 function loadDisplay(){
 
 db.ref('displayConfig').on('value',snap=>{
-
 let d=snap.val();
-
 if(!d) return;
-
 if(d.runningText) document.getElementById('runningText').value=d.runningText;
-
 if(d.youtube) document.getElementById('youtube').value=d.youtube;
-
 });
 
 }
@@ -393,12 +346,11 @@ alert('Video tersimpan');
 }
 
 /* MONITOR */
+
 function listenLoket(id,el){
  db.ref('loket/'+id).on('value',snap=>{
  let d=snap.val();
- if(d){
- document.getElementById(el).innerText=d.nomor;
- }
+ if(d) document.getElementById(el).innerText=d.nomor;
  });
 }
 
@@ -407,83 +359,73 @@ listenLoket('loket2','m2');
 listenLoket('loket3','m3');
 listenLoket('loket4','m4');
 
-/* EXPORT REPORT */
-function exportToday(){
+/* CHART */
 
-let today=new Date().toISOString().slice(0,10);
+let ctx=document.getElementById('chart').getContext('2d');
 
-db.ref('serviceLog/'+today).once('value',snap=>{
+let chart=new Chart(ctx,{type:'bar',data:{labels:['Total','Called','Waiting'],datasets:[{label:'Statistik',data:[0,0,0]}]}});
 
-if(!snap.exists()){
-alert('Belum ada data hari ini');
-return;
+db.ref('stats').on('value',snap=>{
+let s=snap.val();
+if(!s) return;
+chart.data.datasets[0].data=[s.totalToday||0,s.totalCalled||0,s.totalWaiting||0];
+chart.update();
+});
+
+/* BACKUP */
+
+function backupData(){
+
+ db.ref('/').once('value').then(snap=>{
+
+ let data=JSON.stringify(snap.val());
+
+ let blob=new Blob([data],{type:'application/json'});
+
+ let a=document.createElement('a');
+
+ a.href=URL.createObjectURL(blob);
+
+ a.download='backup_antrian.json';
+
+ a.click();
+
+ });
+
 }
 
-let arr=[];
+/* SYSTEM */
 
-snap.forEach(c=>{
-let d=c.val();
-
-arr.push({
-Nomor:d.nomor,
-Loket:d.loket,
-Durasi:d.durasi,
-Panggil:new Date(d.waktuPanggil).toLocaleTimeString(),
-Selesai:new Date(d.waktuSelesai).toLocaleTimeString()
-});
-
-});
-
-let ws=XLSX.utils.json_to_sheet(arr);
-let wb=XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb,ws,'Laporan');
-XLSX.writeFile(wb,'Laporan_Antrian_'+today+'.xlsx');
-
-});
-
-}
-
-/* SYSTEM INFO */
 function loadSystemInfo(){
 
-let html='';
+let html='Firebase Connected<br>';
+html+='Database: antrian-bank-prima-nadi<br>';
+html+='Mode: Production<br>';
+html+='Server Time: '+new Date().toLocaleString('id-ID');
 
-html+='<div class="systemRow">Firebase Connected</div>';
-html+='<div class="systemRow">Database: antrian-bank-prima-nadi</div>';
-html+='<div class="systemRow">Mode: Production</div>';
-
-let today=new Date();
-
-html+='<div class="systemRow">Tanggal Server: '+today.toLocaleString('id-ID')+'</div>';
-
-
-document.getElementById('systemInfo').innerHTML=html;
+ document.getElementById('systemInfo').innerHTML=html;
 
 }
 
 loadSystemInfo();
 
 /* RESET */
+
 function resetSystem(){
 
 if(!confirm('RESET SISTEM ?')) return;
 
-if(!confirm('Semua antrian akan dihapus. Lanjutkan ?')) return;
+ db.ref('counter').set({A:1,B:1});
+ db.ref('queue').remove();
 
-
-db.ref('counter').set({A:1,B:1});
-
-db.ref('queue').remove();
-
-
-db.ref('stats').set({
+ db.ref('stats').set({
  totalWaiting:0,
  totalToday:0,
  totalCalled:0,
  avgServiceTime:0
-});
+ });
 
-alert('Sistem berhasil di reset');
+ alert('Sistem berhasil di reset');
 
 }
 
@@ -491,3 +433,5 @@ alert('Sistem berhasil di reset');
 
 </body>
 </html>
+
+
