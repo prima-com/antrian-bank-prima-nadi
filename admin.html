@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ADMIN CONTROL CENTER - ANTRIAN</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<style>
+body{font-family:Arial;margin:0;background:#0e2f5a;color:white}
+.header{background:#1d4c84;padding:15px 25px;font-size:22px;font-weight:bold}
+.container{display:flex;height:calc(100vh - 60px)}
+.sidebar{width:240px;background:#132f55;padding:15px}
+.sidebar button{width:100%;padding:12px;margin-bottom:8px;border:none;border-radius:6px;background:#FFD700;font-weight:bold;cursor:pointer}
+.content{flex:1;padding:20px;overflow:auto}
+.card{background:#1d4c84;border-radius:10px;padding:15px;margin-bottom:15px}
+input,select{padding:8px;margin:5px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #ffffff33;padding:8px;text-align:center}
+th{background:#274f87}
+.resetBtn{background:#ff5252;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.monitorBox{display:flex;gap:15px}
+.loket{flex:1;background:#163d6b;padding:10px;border-radius:8px;text-align:center}
+.loket span{font-size:28px;color:gold;font-weight:bold}
+</style>
+</head>
+<body>
+
+<div class="header">ADMIN CONTROL CENTER</div>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('users')">User Operator</button>
+<button onclick="show('display')">TV Display</button>
+<button onclick="show('monitor')">Monitoring Loket</button>
+<button onclick="show('reset')">Reset Sistem</button>
+</div>
+
+<div class="content">
+
+<div id="dashboard" class="page">
+<div class="card">
+<h2>Statistik Hari Ini</h2>
+<div id="stats"></div>
+</div>
+</div>
+
+<div id="users" class="page" style="display:none">
+<div class="card">
+<h2>Tambah Operator</h2>
+<input id="uName" placeholder="username">
+<input id="uPass" placeholder="password">
+<select id="uRole">
+<option value="cs">CS</option>
+<option value="teller">TELLER</option>
+</select>
+<button onclick="addUser()">Tambah</button>
+</div>
+
+<div class="card">
+<h2>Daftar Operator</h2>
+<table>
+<thead><tr><th>User</th><th>Role</th><th>Aksi</th></tr></thead>
+<tbody id="userTable"></tbody>
+</table>
+</div>
+</div>
+
+<div id="display" class="page" style="display:none">
+<div class="card">
+<h2>Running Text TV</h2>
+<input id="runningText" style="width:60%">
+<button onclick="saveRunning()">Simpan</button>
+</div>
+
+<div class="card">
+<h2>Youtube Video</h2>
+<input id="youtube" style="width:60%">
+<button onclick="saveYoutube()">Simpan</button>
+</div>
+</div>
+
+<div id="monitor" class="page" style="display:none">
+<div class="card">
+<h2>Monitoring Loket</h2>
+<div class="monitorBox">
+<div class="loket">LOKET 1<br><span id="m1">-</span></div>
+<div class="loket">LOKET 2<br><span id="m2">-</span></div>
+<div class="loket">LOKET 3<br><span id="m3">-</span></div>
+<div class="loket">LOKET 4<br><span id="m4">-</span></div>
+</div>
+</div>
+</div>
+
+<div id="reset" class="page" style="display:none">
+<div class="card">
+<h2>Reset Sistem Antrian</h2>
+<button class="resetBtn" onclick="resetSystem()">RESET SEMUA ANTRIAN</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+var firebaseConfig={
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
+authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
+databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"antrian-bank-prima-nadi"
+};
+firebase.initializeApp(firebaseConfig);
+var db=firebase.database();
+
+function show(id){
+document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+document.getElementById(id).style.display='block';
+}
+
+/* STATISTIK */
+db.ref('stats').on('value',snap=>{
+let s=snap.val();
+if(!s) return;
+document.getElementById('stats').innerHTML=
+"Total Hari Ini: "+(s.totalToday||0)+"<br>"+
+"Dipanggil: "+(s.totalCalled||0)+"<br>"+
+"Menunggu: "+(s.totalWaiting||0)+"<br>"+
+"Avg Service: "+Math.round((s.avgServiceTime||0)/1000)+" detik";
+});
+
+/* USER */
+function addUser(){
+let u=document.getElementById('uName').value;
+let p=document.getElementById('uPass').value;
+let r=document.getElementById('uRole').value;
+if(!u||!p) return alert('isi lengkap');
+
+db.ref('users/'+u).set({password:p,role:r});
+}
+
+function loadUsers(){
+db.ref('users').on('value',snap=>{
+let html='';
+snap.forEach(c=>{
+let d=c.val();
+html+=`<tr>
+<td>${c.key}</td>
+<td>${d.role}</td>
+<td><button onclick="delUser('${c.key}')">Hapus</button></td>
+</tr>`;
+});
+document.getElementById('userTable').innerHTML=html;
+});
+}
+
+function delUser(u){
+if(confirm('hapus user?')){
+db.ref('users/'+u).remove();
+}
+}
+
+loadUsers();
+
+/* DISPLAY CONFIG */
+function saveRunning(){
+let t=document.getElementById('runningText').value;
+db.ref('displayConfig/runningText').set(t);
+}
+
+function saveYoutube(){
+let y=document.getElementById('youtube').value;
+db.ref('displayConfig/youtube').set(y);
+}
+
+/* MONITOR */
+function listenLoket(id,el){
+db.ref('loket/'+id).on('value',snap=>{
+let d=snap.val();
+if(d) document.getElementById(el).innerText=d.nomor;
+});
+}
+
+listenLoket('loket1','m1');
+listenLoket('loket2','m2');
+listenLoket('loket3','m3');
+listenLoket('loket4','m4');
+
+/* RESET */
+function resetSystem(){
+if(!confirm('Yakin reset semua antrian?')) return;
+
+db.ref('counter').set({A:1,B:1});
+db.ref('queue').remove();
+db.ref('stats').set({
+ totalWaiting:0,
+ totalToday:0,
+ totalCalled:0,
+ avgServiceTime:0
+});
+
+alert('Sistem berhasil di reset');
+}
+
+</script>
+
+</body>
+</html>
