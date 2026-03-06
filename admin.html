@@ -5,12 +5,15 @@
 <title>ADMIN CONTROL CENTER - ANTRIAN</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 <style>
 body{font-family:Arial;margin:0;background:#0e2f5a;color:white}
-.header{background:#1d4c84;padding:15px 25px;font-size:22px;font-weight:bold}
+.header{background:#1d4c84;padding:15px 25px;font-size:22px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
 .container{display:flex;height:calc(100vh - 60px)}
 .sidebar{width:240px;background:#132f55;padding:15px}
 .sidebar button{width:100%;padding:12px;margin-bottom:8px;border:none;border-radius:6px;background:#FFD700;font-weight:bold;cursor:pointer}
+.sidebar button:hover{opacity:.9}
 .content{flex:1;padding:20px;overflow:auto}
 .card{background:#1d4c84;border-radius:10px;padding:15px;margin-bottom:15px}
 input,select{padding:8px;margin:5px}
@@ -18,55 +21,140 @@ table{width:100%;border-collapse:collapse;margin-top:10px}
 th,td{border:1px solid #ffffff33;padding:8px;text-align:center}
 th{background:#274f87}
 .resetBtn{background:#ff5252;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
-.monitorBox{display:flex;gap:15px}
-.loket{flex:1;background:#163d6b;padding:10px;border-radius:8px;text-align:center}
+.monitorBox{display:flex;gap:15px;flex-wrap:wrap}
+.loket{flex:1;min-width:150px;background:#163d6b;padding:10px;border-radius:8px;text-align:center}
 .loket span{font-size:28px;color:gold;font-weight:bold}
+.statGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+.statItem{background:#163d6b;padding:15px;border-radius:8px;text-align:center}
+.statItem h3{margin:0 0 10px 0}
+.statItem span{font-size:26px;color:#FFD700;font-weight:bold}
+.loginBox{position:fixed;inset:0;background:#0e2f5a;display:flex;justify-content:center;align-items:center;z-index:9999}
+.loginContent{background:white;color:black;padding:30px;border-radius:10px;width:300px;text-align:center}
+.loginContent input{width:100%;margin-bottom:10px}
+.systemRow{margin:6px 0}
+.logoutBtn{background:#ff9800;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:bold}
+.queueBox{max-height:400px;overflow:auto}
+.actionBtn{padding:6px 10px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
+.callBtn{background:#4caf50;color:white}
+.skipBtn{background:#ff9800;color:white}
+.delBtn{background:#f44336;color:white}
+.exportBtn{background:#00c853;color:white;padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
 </style>
 </head>
 <body>
 
-<div class="header">ADMIN CONTROL CENTER</div>
+<div class="loginBox" id="loginBox">
+<div class="loginContent">
+<h3>Login Admin</h3>
+<input id="adminUser" placeholder="username">
+<input id="adminPass" type="password" placeholder="password">
+<button onclick="loginAdmin()">LOGIN</button>
+</div>
+</div>
+
+<div class="header">
+<div>ADMIN CONTROL CENTER</div>
+<div id="adminInfo"></div>
+</div>
 
 <div class="container">
 
 <div class="sidebar">
 <button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('monitor')">Monitoring Loket</button>
+<button onclick="show('queue')">Manajemen Antrian</button>
 <button onclick="show('users')">User Operator</button>
 <button onclick="show('display')">TV Display</button>
-<button onclick="show('monitor')">Monitoring Loket</button>
+<button onclick="show('report')">Laporan</button>
+<button onclick="show('system')">System Info</button>
 <button onclick="show('reset')">Reset Sistem</button>
 </div>
 
 <div class="content">
 
+<!-- DASHBOARD -->
 <div id="dashboard" class="page">
 <div class="card">
-<h2>Statistik Hari Ini</h2>
-<div id="stats"></div>
+<h2>Statistik Sistem Hari Ini</h2>
+<div class="statGrid">
+<div class="statItem"><h3>Total Antrian</h3><span id="sTotal">0</span></div>
+<div class="statItem"><h3>Sudah Dipanggil</h3><span id="sCalled">0</span></div>
+<div class="statItem"><h3>Menunggu</h3><span id="sWaiting">0</span></div>
+<div class="statItem"><h3>Rata Layanan</h3><span id="sAvg">0</span></div>
+</div>
 </div>
 </div>
 
+<!-- MONITOR -->
+<div id="monitor" class="page" style="display:none">
+<div class="card">
+<h2>Monitoring Loket Real-Time</h2>
+<div class="monitorBox">
+<div class="loket">LOKET 1<br><span id="m1">-</span></div>
+<div class="loket">LOKET 2<br><span id="m2">-</span></div>
+<div class="loket">LOKET 3<br><span id="m3">-</span></div>
+<div class="loket">LOKET 4<br><span id="m4">-</span></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Antrian Menunggu</h2>
+<div class="statGrid">
+<div class="statItem"><h3>CS (A)</h3><span id="waitingA">0</span></div>
+<div class="statItem"><h3>TELLER (B)</h3><span id="waitingB">0</span></div>
+</div>
+</div>
+</div>
+
+<!-- QUEUE MANAGER -->
+<div id="queue" class="page" style="display:none">
+<div class="card">
+<h2>Manajemen Antrian Real-Time</h2>
+<div class="queueBox">
+<table>
+<thead>
+<tr>
+<th>Nomor</th>
+<th>Status</th>
+<th>Loket</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="queueTable"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- USERS -->
 <div id="users" class="page" style="display:none">
 <div class="card">
 <h2>Tambah Operator</h2>
 <input id="uName" placeholder="username">
 <input id="uPass" placeholder="password">
 <select id="uRole">
-<option value="cs">CS</option>
-<option value="teller">TELLER</option>
+<option value="cs">Customer Service</option>
+<option value="teller">Teller</option>
 </select>
-<button onclick="addUser()">Tambah</button>
+<button onclick="addUser()">Tambah Operator</button>
 </div>
 
 <div class="card">
 <h2>Daftar Operator</h2>
 <table>
-<thead><tr><th>User</th><th>Role</th><th>Aksi</th></tr></thead>
+<thead>
+<tr>
+<th>Username</th>
+<th>Role</th>
+<th>Aksi</th>
+</tr>
+</thead>
 <tbody id="userTable"></tbody>
 </table>
 </div>
 </div>
 
+<!-- DISPLAY -->
 <div id="display" class="page" style="display:none">
 <div class="card">
 <h2>Running Text TV</h2>
@@ -75,27 +163,33 @@ th{background:#274f87}
 </div>
 
 <div class="card">
-<h2>Youtube Video</h2>
+<h2>Youtube Video TV</h2>
 <input id="youtube" style="width:60%">
 <button onclick="saveYoutube()">Simpan</button>
 </div>
 </div>
 
-<div id="monitor" class="page" style="display:none">
+<!-- REPORT -->
+<div id="report" class="page" style="display:none">
 <div class="card">
-<h2>Monitoring Loket</h2>
-<div class="monitorBox">
-<div class="loket">LOKET 1<br><span id="m1">-</span></div>
-<div class="loket">LOKET 2<br><span id="m2">-</span></div>
-<div class="loket">LOKET 3<br><span id="m3">-</span></div>
-<div class="loket">LOKET 4<br><span id="m4">-</span></div>
-</div>
+<h2>Export Laporan Hari Ini</h2>
+<button class="exportBtn" onclick="exportToday()">Download Excel</button>
 </div>
 </div>
 
+<!-- SYSTEM INFO -->
+<div id="system" class="page" style="display:none">
+<div class="card">
+<h2>Status Sistem</h2>
+<div id="systemInfo"></div>
+</div>
+</div>
+
+<!-- RESET -->
 <div id="reset" class="page" style="display:none">
 <div class="card">
 <h2>Reset Sistem Antrian</h2>
+<p>Fungsi ini akan menghapus semua antrian yang sedang berjalan.</p>
 <button class="resetBtn" onclick="resetSystem()">RESET SEMUA ANTRIAN</button>
 </div>
 </div>
@@ -104,6 +198,7 @@ th{background:#274f87}
 </div>
 
 <script>
+
 var firebaseConfig={
 apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
@@ -112,6 +207,25 @@ projectId:"antrian-bank-prima-nadi"
 };
 firebase.initializeApp(firebaseConfig);
 var db=firebase.database();
+
+let adminUser=null;
+
+/* LOGIN */
+function loginAdmin(){
+const u=document.getElementById('adminUser').value;
+const p=document.getElementById('adminPass').value;
+
+if(u==='admin' && p==='admin123'){
+adminUser=u;
+document.getElementById('loginBox').style.display='none';
+document.getElementById('adminInfo').innerHTML='Login: '+u+' <button class="logoutBtn" onclick="logout()">Logout</button>';
+}
+else{
+alert('Login gagal');
+}
+}
+
+function logout(){location.reload();}
 
 function show(id){
 document.querySelectorAll('.page').forEach(p=>p.style.display='none');
@@ -122,63 +236,170 @@ document.getElementById(id).style.display='block';
 db.ref('stats').on('value',snap=>{
 let s=snap.val();
 if(!s) return;
-document.getElementById('stats').innerHTML=
-"Total Hari Ini: "+(s.totalToday||0)+"<br>"+
-"Dipanggil: "+(s.totalCalled||0)+"<br>"+
-"Menunggu: "+(s.totalWaiting||0)+"<br>"+
-"Avg Service: "+Math.round((s.avgServiceTime||0)/1000)+" detik";
+
+document.getElementById('sTotal').innerText=s.totalToday||0;
+document.getElementById('sCalled').innerText=s.totalCalled||0;
+document.getElementById('sWaiting').innerText=s.totalWaiting||0;
+document.getElementById('sAvg').innerText=Math.round((s.avgServiceTime||0)/1000)+'s';
 });
 
-/* USER */
+/* WAITING COUNT */
+function countWaiting(prefix,el){
+ db.ref('queue/'+prefix).orderByChild('status').equalTo('waiting').on('value',snap=>{
+ let count=0;
+ snap.forEach(()=>{count++;});
+ document.getElementById(el).innerText=count;
+ });
+}
+
+countWaiting('A','waitingA');
+countWaiting('B','waitingB');
+
+/* QUEUE MANAGER */
+function loadQueue(){
+
+let refA=db.ref('queue/A');
+let refB=db.ref('queue/B');
+
+function render(){
+
+Promise.all([
+refA.once('value'),
+refB.once('value')
+]).then(res=>{
+
+let html='';
+
+res.forEach(snap=>{
+if(!snap.exists()) return;
+
+snap.forEach(child=>{
+let d=child.val();
+
+html+=`<tr>
+<td>${d.nomor}</td>
+<td>${d.status}</td>
+<td>${d.loket||'-'}</td>
+<td>
+<button class="actionBtn delBtn" onclick="deleteQueue('${snap.key}','${child.key}')">Hapus</button>
+</td>
+</tr>`;
+
+});
+
+});
+
+document.getElementById('queueTable').innerHTML=html;
+
+});
+
+}
+
+refA.on('value',render);
+refB.on('value',render);
+
+}
+
+function deleteQueue(prefix,id){
+if(!confirm('Hapus antrian ini?')) return;
+
+db.ref('queue/'+prefix+'/'+id).remove();
+}
+
+loadQueue();
+
+/* USERS */
 function addUser(){
 let u=document.getElementById('uName').value;
 let p=document.getElementById('uPass').value;
 let r=document.getElementById('uRole').value;
-if(!u||!p) return alert('isi lengkap');
+
+if(!u||!p) return alert('Data belum lengkap');
 
 db.ref('users/'+u).set({password:p,role:r});
+
+document.getElementById('uName').value='';
+document.getElementById('uPass').value='';
 }
 
 function loadUsers(){
+
 db.ref('users').on('value',snap=>{
 let html='';
+
 snap.forEach(c=>{
 let d=c.val();
+
 html+=`<tr>
 <td>${c.key}</td>
 <td>${d.role}</td>
-<td><button onclick="delUser('${c.key}')">Hapus</button></td>
+<td>
+<button onclick="delUser('${c.key}')">Hapus</button>
+</td>
 </tr>`;
+
 });
+
 document.getElementById('userTable').innerHTML=html;
+
 });
+
 }
 
 function delUser(u){
-if(confirm('hapus user?')){
+if(confirm('Hapus user '+u+' ?')){
+
+if(u==='admin'){
+alert('Admin utama tidak bisa dihapus');
+return;
+}
+
 db.ref('users/'+u).remove();
+
 }
 }
 
 loadUsers();
 
-/* DISPLAY CONFIG */
+/* DISPLAY */
+function loadDisplay(){
+
+db.ref('displayConfig').on('value',snap=>{
+
+let d=snap.val();
+
+if(!d) return;
+
+if(d.runningText) document.getElementById('runningText').value=d.runningText;
+
+if(d.youtube) document.getElementById('youtube').value=d.youtube;
+
+});
+
+}
+
+loadDisplay();
+
 function saveRunning(){
 let t=document.getElementById('runningText').value;
 db.ref('displayConfig/runningText').set(t);
+alert('Running text tersimpan');
 }
 
 function saveYoutube(){
 let y=document.getElementById('youtube').value;
 db.ref('displayConfig/youtube').set(y);
+alert('Video tersimpan');
 }
 
 /* MONITOR */
 function listenLoket(id,el){
-db.ref('loket/'+id).on('value',snap=>{
-let d=snap.val();
-if(d) document.getElementById(el).innerText=d.nomor;
-});
+ db.ref('loket/'+id).on('value',snap=>{
+ let d=snap.val();
+ if(d){
+ document.getElementById(el).innerText=d.nomor;
+ }
+ });
 }
 
 listenLoket('loket1','m1');
@@ -186,12 +407,75 @@ listenLoket('loket2','m2');
 listenLoket('loket3','m3');
 listenLoket('loket4','m4');
 
+/* EXPORT REPORT */
+function exportToday(){
+
+let today=new Date().toISOString().slice(0,10);
+
+db.ref('serviceLog/'+today).once('value',snap=>{
+
+if(!snap.exists()){
+alert('Belum ada data hari ini');
+return;
+}
+
+let arr=[];
+
+snap.forEach(c=>{
+let d=c.val();
+
+arr.push({
+Nomor:d.nomor,
+Loket:d.loket,
+Durasi:d.durasi,
+Panggil:new Date(d.waktuPanggil).toLocaleTimeString(),
+Selesai:new Date(d.waktuSelesai).toLocaleTimeString()
+});
+
+});
+
+let ws=XLSX.utils.json_to_sheet(arr);
+let wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,'Laporan');
+XLSX.writeFile(wb,'Laporan_Antrian_'+today+'.xlsx');
+
+});
+
+}
+
+/* SYSTEM INFO */
+function loadSystemInfo(){
+
+let html='';
+
+html+='<div class="systemRow">Firebase Connected</div>';
+html+='<div class="systemRow">Database: antrian-bank-prima-nadi</div>';
+html+='<div class="systemRow">Mode: Production</div>';
+
+let today=new Date();
+
+html+='<div class="systemRow">Tanggal Server: '+today.toLocaleString('id-ID')+'</div>';
+
+
+document.getElementById('systemInfo').innerHTML=html;
+
+}
+
+loadSystemInfo();
+
 /* RESET */
 function resetSystem(){
-if(!confirm('Yakin reset semua antrian?')) return;
+
+if(!confirm('RESET SISTEM ?')) return;
+
+if(!confirm('Semua antrian akan dihapus. Lanjutkan ?')) return;
+
 
 db.ref('counter').set({A:1,B:1});
+
 db.ref('queue').remove();
+
+
 db.ref('stats').set({
  totalWaiting:0,
  totalToday:0,
@@ -200,6 +484,7 @@ db.ref('stats').set({
 });
 
 alert('Sistem berhasil di reset');
+
 }
 
 </script>
