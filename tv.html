@@ -329,7 +329,7 @@ z-index:9999;
 
 <div class="tv-wrapper">
 <div class="tv">
-<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
+<iframe id="youtubeFrame" src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
 </div>
 <div class="penjaminan">
 <center>Simpanan Nasabah dijamin oleh LPS sesuai ketentuan</center>
@@ -356,7 +356,7 @@ z-index:9999;
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
+<div id="runningTextTV">Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -468,6 +468,57 @@ promoEl.style.opacity=1;
 },800);
 
 },5000);
+
+
+/* SINKRON TV DISPLAY DARI ADMIN */
+
+db.ref("displayConfig").on("value",snap=>{
+
+const data=snap.val();
+if(!data) return;
+
+/* RUNNING TEXT */
+
+if(data.runningText){
+document.getElementById("runningTextTV").innerText=data.runningText;
+}
+
+/* YOUTUBE VIDEO */
+
+if(data.youtube){
+
+let video=data.youtube;
+
+/* jika admin paste link youtube normal */
+
+if(video.includes("watch?v=")){
+video=video.split("watch?v=")[1];
+}
+
+if(video.includes("youtu.be/")){
+video=video.split("youtu.be/")[1];
+}
+
+/* ubah ke embed */
+
+const embed="https://www.youtube.com/embed/"+video+"?autoplay=1&mute=1";
+
+document.getElementById("youtubeFrame").src=embed;
+
+}
+
+});
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 </body>
