@@ -100,7 +100,6 @@ font-size:16px;
 font-weight:bold;
 letter-spacing:2px;
 color:#FFD700;
-box-shadow:0 0 10px rgba(255,215,0,0.4);
 }
 
 /* PROMO */
@@ -123,13 +122,11 @@ transition:opacity 0.8s ease;
 animation:glowPulse 2s infinite alternate;
 }
 
-/* Glow hidup */
 @keyframes glowPulse{
 from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
 to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
 }
 
-/* PROMO2 SLIDE */
 .slide-in{
 animation:slideFromLeft 2.5s ease forwards,
 glowPulse 2s infinite alternate;
@@ -146,7 +143,6 @@ opacity:1;
 }
 }
 
-/* PROMO3 SLIDE JAUH + BOUNCE */
 .slide-in-far{
 animation:slideFromLeftFarBounce 3.2s cubic-bezier(.25,.8,.25,1) forwards,
 glowPulse 2s infinite alternate;
@@ -246,29 +242,6 @@ font-weight:bold;
 text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
 }
 
-.active-loket{
-animation:pulse 1.2s ease-in-out 3;
-border:2px solid #FFD700;
-box-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
-}
-
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.05);}
-100%{transform:scale(1);}
-}
-
-.blink{
-animation:blinkAnim 0.6s ease-in-out 3;
-}
-
-@keyframes blinkAnim{
-0%{opacity:1;}
-50%{opacity:0.3;}
-100%{opacity:1;}
-}
-
-/* RUNNING TEXT */
 .running{
 background:#0a2445;
 color:yellow;
@@ -289,7 +262,6 @@ animation:jalan 20s linear infinite;
 100%{transform:translateX(-100%);}
 }
 
-/* AUDIO UNLOCK */
 #unlock{
 position:fixed;
 top:0;
@@ -329,7 +301,7 @@ z-index:9999;
 
 <div class="tv-wrapper">
 <div class="tv">
-<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
+<iframe id="youtubeFrame" src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
 </div>
 <div class="penjaminan">
 <center>Simpanan Nasabah dijamin oleh LPS sesuai ketentuan</center>
@@ -356,14 +328,15 @@ z-index:9999;
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
+<div id="runningTextTV">Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-const firebaseConfig = {
+
+const firebaseConfig={
 apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -373,58 +346,40 @@ projectId:"antrian-bank-prima-nadi"
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let audioAktif=false;
-let lastCalled={};
+db.ref("displayConfig").on("value",snap=>{
 
-function aktifkanSuara(){
-audioAktif=true;
-speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
-document.getElementById("unlock").style.display="none";
-}
-
-function speak(text){
-if(!audioAktif) return;
-speechSynthesis.cancel();
-setTimeout(()=>{
-const msg=new SpeechSynthesisUtterance(text);
-msg.lang="id-ID";
-speechSynthesis.speak(msg);
-},100);
-}
-
-function formatBaca(nomor,loket){
-return "Nomor antrian "+nomor+" silakan menuju "+loket.replace("loket","loket ");
-}
-
-function listenLoket(id){
-db.ref("loket/"+id).on("value",(snap)=>{
 const data=snap.val();
 if(!data) return;
 
-const nomor=data.nomor;
-const loketBox=document.getElementById(id).parentElement;
-
-document.getElementById(id).innerText=nomor;
-
-if(nomor.startsWith("A")){
-document.getElementById("displayA").innerText = nomor;
-}
-if(nomor.startsWith("B")){
-document.getElementById("displayB").innerText = nomor;
+if(data.runningText){
+document.getElementById("runningTextTV").innerText=data.runningText;
 }
 
-if(lastCalled[id]!==data.waktu){
-loketBox.classList.add("active-loket");
-document.getElementById(id).classList.add("blink");
+if(data.youtube){
 
-setTimeout(()=>{
-loketBox.classList.remove("active-loket");
-document.getElementById(id).classList.remove("blink");
-},2500);
+let video=data.youtube;
 
-speak(formatBaca(nomor,id));
-lastCalled[id]=data.waktu;
+if(video.includes("watch?v=")){
+video=video.split("watch?v=")[1];
 }
+
+if(video.includes("youtu.be/")){
+video=video.split("youtu.be/")[1];
+}
+
+const embed="https://www.youtube.com/embed/"+video+"?autoplay=1&mute=1";
+
+document.getElementById("youtubeFrame").src=embed;
+
+}
+
+});
+
+function listenLoket(id){
+db.ref("loket/"+id).on("value",snap=>{
+let d=snap.val();
+if(!d) return;
+document.getElementById(id).innerText=d.nomor;
 });
 }
 
@@ -439,35 +394,10 @@ document.getElementById("jam").innerHTML=
 now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+
 "<br>Pukul "+now.toLocaleTimeString("id-ID");
 }
+
 setInterval(updateJam,1000);
 updateJam();
 
-/* AUTO ROTATE GAMBAR FINAL */
-const promoImages=["promo1.png","promo2.png","promo3.png"];
-let promoIndex=0;
-const promoEl=document.getElementById("promoImage");
-
-setInterval(()=>{
-promoEl.classList.remove("slide-in","slide-in-far");
-promoEl.style.opacity=0;
-
-setTimeout(()=>{
-promoIndex=(promoIndex+1)%promoImages.length;
-promoEl.src=promoImages[promoIndex];
-
-if(promoImages[promoIndex]==="promo2.png"){
-promoEl.classList.add("slide-in");
-}
-else if(promoImages[promoIndex]==="promo3.png"){
-promoEl.classList.add("slide-in-far");
-}
-else{
-promoEl.style.opacity=1;
-}
-
-},800);
-
-},5000);
 </script>
 
 </body>
