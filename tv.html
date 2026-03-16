@@ -112,6 +112,7 @@ padding:15px;
 position:relative;
 }
 
+/* FOTO PROMO */
 .promo-img{
 position:absolute;
 bottom:10px;
@@ -122,30 +123,50 @@ transition:opacity 0.8s ease;
 animation:glowPulse 2s infinite alternate;
 }
 
+/* Glow hidup */
 @keyframes glowPulse{
 from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
 to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
 }
 
+/* PROMO2 SLIDE */
 .slide-in{
-animation:slideFromLeft 2.5s ease forwards, glowPulse 2s infinite alternate;
+animation:slideFromLeft 2.5s ease forwards,
+glowPulse 2s infinite alternate;
 }
 
 @keyframes slideFromLeft{
-from{transform:translateX(-120px);opacity:0;}
-to{transform:translateX(0);opacity:1;}
+from{
+transform:translateX(-120px);
+opacity:0;
+}
+to{
+transform:translateX(0);
+opacity:1;
+}
 }
 
+/* PROMO3 SLIDE JAUH + BOUNCE */
 .slide-in-far{
 animation:slideFromLeftFarBounce 3.2s cubic-bezier(.25,.8,.25,1) forwards,
 glowPulse 2s infinite alternate;
 }
 
 @keyframes slideFromLeftFarBounce{
-0%{transform:translateX(-300px);opacity:0;}
-70%{transform:translateX(15px);opacity:1;}
-85%{transform:translateX(-8px);}
-100%{transform:translateX(0);}
+0%{
+transform:translateX(-300px);
+opacity:0;
+}
+70%{
+transform:translateX(15px);
+opacity:1;
+}
+85%{
+transform:translateX(-8px);
+}
+100%{
+transform:translateX(0);
+}
 }
 
 .promo table{
@@ -173,7 +194,10 @@ text-align:center;
 .highlight-rate{
 color:#FFD700;
 font-weight:bold;
-text-shadow:0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
+text-shadow:
+0 0 5px #FFD700,
+0 0 10px #FFD700,
+0 0 20px rgba(255,215,0,0.8);
 animation:goldPulse 2s infinite;
 }
 
@@ -203,11 +227,15 @@ text-align:center;
 display:flex;
 flex-direction:column;
 justify-content:center;
+box-shadow:inset 0 2px 4px rgba(255,255,255,0.1),
+0 3px 8px rgba(0,0,0,0.5);
 }
 
 .loket h3{
 margin:0;
 font-size:14px;
+font-weight:600;
+letter-spacing:1px;
 color:#cfd8ff;
 }
 
@@ -215,8 +243,32 @@ color:#cfd8ff;
 font-size:24px;
 color:#FFD700;
 font-weight:bold;
+text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
 }
 
+.active-loket{
+animation:pulse 1.2s ease-in-out 3;
+border:2px solid #FFD700;
+box-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+
+.blink{
+animation:blinkAnim 0.6s ease-in-out 3;
+}
+
+@keyframes blinkAnim{
+0%{opacity:1;}
+50%{opacity:0.3;}
+100%{opacity:1;}
+}
+
+/* RUNNING TEXT */
 .running{
 background:#0a2445;
 color:yellow;
@@ -237,6 +289,7 @@ animation:jalan 20s linear infinite;
 100%{transform:translateX(-100%);}
 }
 
+/* AUDIO UNLOCK */
 #unlock{
 position:fixed;
 top:0;
@@ -276,7 +329,7 @@ z-index:9999;
 
 <div class="tv-wrapper">
 <div class="tv">
-<iframe id="tvYoutube" src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
+<iframe src="https://www.youtube.com/embed/uB-cnjYFTBA?autoplay=1&mute=1"></iframe>
 </div>
 <div class="penjaminan">
 <center>Simpanan Nasabah dijamin oleh LPS sesuai ketentuan</center>
@@ -303,16 +356,14 @@ z-index:9999;
 </div>
 
 <div class="running">
-<div id="runningTextTV">
-Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih
-</div>
+<div>Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-const firebaseConfig={
+const firebaseConfig = {
 apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -326,22 +377,14 @@ let audioAktif=false;
 let lastCalled={};
 
 function aktifkanSuara(){
-
 audioAktif=true;
-
-const msg=new SpeechSynthesisUtterance("Sistem suara aktif");
-msg.lang="id-ID";
-speechSynthesis.cancel();
-speechSynthesis.speak(msg);
-
+speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
 document.getElementById("unlock").style.display="none";
 }
 
 function speak(text){
 if(!audioAktif) return;
-
 speechSynthesis.cancel();
-
 setTimeout(()=>{
 const msg=new SpeechSynthesisUtterance(text);
 msg.lang="id-ID";
@@ -359,12 +402,26 @@ const data=snap.val();
 if(!data) return;
 
 const nomor=data.nomor;
+const loketBox=document.getElementById(id).parentElement;
+
 document.getElementById(id).innerText=nomor;
 
-if(nomor.startsWith("A")) document.getElementById("displayA").innerText=nomor;
-if(nomor.startsWith("B")) document.getElementById("displayB").innerText=nomor;
+if(nomor.startsWith("A")){
+document.getElementById("displayA").innerText = nomor;
+}
+if(nomor.startsWith("B")){
+document.getElementById("displayB").innerText = nomor;
+}
 
 if(lastCalled[id]!==data.waktu){
+loketBox.classList.add("active-loket");
+document.getElementById(id).classList.add("blink");
+
+setTimeout(()=>{
+loketBox.classList.remove("active-loket");
+document.getElementById(id).classList.remove("blink");
+},2500);
+
 speak(formatBaca(nomor,id));
 lastCalled[id]=data.waktu;
 }
@@ -385,7 +442,7 @@ now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"
 setInterval(updateJam,1000);
 updateJam();
 
-/* ROTATE PROMO */
+/* AUTO ROTATE GAMBAR FINAL */
 const promoImages=["promo1.png","promo2.png","promo3.png"];
 let promoIndex=0;
 const promoEl=document.getElementById("promoImage");
@@ -411,30 +468,6 @@ promoEl.style.opacity=1;
 },800);
 
 },5000);
-
-/* SINKRON ADMIN */
-db.ref("displayConfig").on("value",(snap)=>{
-const d=snap.val();
-if(!d) return;
-
-if(d.runningText){
-document.getElementById("runningTextTV").innerText=d.runningText;
-}
-
-if(d.youtube){
-let link=d.youtube;
-
-if(link.includes("watch?v=")){
-link=link.replace("watch?v=","embed/");
-}
-
-if(!link.includes("autoplay")){
-link+="?autoplay=1&mute=1";
-}
-
-document.getElementById("tvYoutube").src=link;
-}
-});
 </script>
 
 </body>
