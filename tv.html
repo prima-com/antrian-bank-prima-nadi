@@ -374,9 +374,24 @@ const audioBase="audio/";
 
 function playAudio(file){
 return new Promise(resolve=>{
-const a=new Audio(audioBase+file);
-a.onended=resolve;
-a.play();
+
+const audio=new Audio(audioBase+file);
+audio.volume = 1.0;
+
+audio.onended = ()=>{
+setTimeout(resolve, 150);
+};
+
+audio.onerror = ()=>{
+console.log("Audio gagal:", file);
+resolve();
+};
+
+audio.play().catch(err=>{
+console.log("Play error:", err);
+resolve();
+});
+
 });
 }
 
@@ -388,6 +403,7 @@ const huruf=nomor.charAt(0);
 const angka=nomor.substring(1).split("");
 
 await playAudio("ding.mp3");
+await new Promise(r=>setTimeout(r,200));
 
 await playAudio("nomor_antrian.mp3");
 
@@ -412,7 +428,15 @@ let lastCalled={};
 
 function aktifkanSuara(){
 audioAktif=true;
-speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
+
+// trigger unlock audio Android TV
+const a = new Audio(audioBase+"ding.mp3");
+a.play().catch(()=>{});
+
+speechSynthesis.speak(
+new SpeechSynthesisUtterance("Sistem suara aktif")
+);
+
 document.getElementById("unlock").style.display="none";
 }
 
