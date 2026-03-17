@@ -5,38 +5,310 @@
 <title>Display Antrian Bank Prima Nadi</title>
 
 <style>
-/* ===== CSS ASLI (TIDAK DIUBAH) ===== */
-body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
-.header{height:70px;background:#1d4c84;display:flex;align-items:center;justify-content:space-between;padding:0 30px;}
-.led{font-size:16px;font-weight:bold;letter-spacing:2px;color:#FFD700;}
-.container{display:flex;height:62vh;padding:15px;gap:15px;}
-.left{width:28%;display:flex;flex-direction:column;gap:12px;}
-.box{background:#2a638a;border-radius:15px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+body{
+margin:0;
+font-family:Arial;
+background:#0b2d57;
+color:white;
+}
+
+/* HEADER */
+.header{
+height:70px;
+background:#1d4c84;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 30px;
+}
+
+.led{
+font-size:16px;
+font-weight:bold;
+letter-spacing:2px;
+color:#FFD700;
+}
+
+/* MAIN */
+.container{
+display:flex;
+height:62vh;
+padding:15px;
+gap:15px;
+}
+
+.left{
+width:28%;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.box{
+background:#2a638a;
+border-radius:15px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
 .small{height:12%;}
 .big{height:38%;}
-.title{font-size:22px;font-weight:bold;}
-.nomor{font-size:80px;font-weight:bold;color:gold;text-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.7);}
-.tv-wrapper{width:45%;display:flex;flex-direction:column;gap:10px;}
-.tv{height:85%;border-radius:15px;overflow:hidden;}
-.tv iframe{width:100%;height:100%;border:none;}
-.penjaminan{height:15%;background:#1d4c84;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;letter-spacing:2px;color:#FFD700;}
-.promo{width:27%;background:#163d6b;border-radius:15px;padding:15px;position:relative;}
-.promo-img{position:absolute;bottom:10px;right:10px;width:95px;animation:glowPulse 2s infinite alternate;}
-@keyframes glowPulse{from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}}
-.mini{display:flex;gap:12px;padding:6px 20px;height:60px;align-items:center;background:#0e2f5a;}
-.loket{flex:1;background:#163d6b;border-radius:25px;padding:5px;text-align:center;}
-.loket span{font-size:24px;color:#FFD700;font-weight:bold;}
-.running{background:#0a2445;color:yellow;padding:10px;white-space:nowrap;overflow:hidden;}
-.running div{display:inline-block;padding-left:100%;animation:jalan 20s linear infinite;}
-@keyframes jalan{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
-#unlock{position:fixed;top:0;left:0;width:100%;height:100%;background:#000c;display:flex;align-items:center;justify-content:center;z-index:9999;}
+
+.title{
+font-size:22px;
+font-weight:bold;
+}
+
+.nomor{
+font-size:80px;
+font-weight:bold;
+color:gold;
+text-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.7);
+}
+
+/* TV WRAPPER */
+.tv-wrapper{
+width:45%;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.tv{
+height:85%;
+border-radius:15px;
+overflow:hidden;
+}
+
+.tv iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+/* FRAME PENJAMINAN */
+.penjaminan{
+height:15%;
+background:#1d4c84;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:16px;
+font-weight:bold;
+letter-spacing:2px;
+color:#FFD700;
+box-shadow:0 0 10px rgba(255,215,0,0.4);
+}
+
+/* PROMO */
+.promo{
+width:27%;
+background:#163d6b;
+border-radius:15px;
+padding:15px;
+position:relative;
+}
+
+/* FOTO PROMO */
+.promo-img{
+position:absolute;
+bottom:10px;
+right:10px;
+width:95px;
+opacity:1;
+transition:opacity 0.8s ease;
+animation:glowPulse 2s infinite alternate;
+}
+
+/* Glow hidup */
+@keyframes glowPulse{
+from{filter:drop-shadow(0 0 5px rgba(255,215,0,0.5));}
+to{filter:drop-shadow(0 0 12px rgba(255,215,0,0.9));}
+}
+
+/* PROMO2 SLIDE */
+.slide-in{
+animation:slideFromLeft 2.5s ease forwards,
+glowPulse 2s infinite alternate;
+}
+
+@keyframes slideFromLeft{
+from{
+transform:translateX(-120px);
+opacity:0;
+}
+to{
+transform:translateX(0);
+opacity:1;
+}
+}
+
+/* PROMO3 SLIDE JAUH + BOUNCE */
+.slide-in-far{
+animation:slideFromLeftFarBounce 3.2s cubic-bezier(.25,.8,.25,1) forwards,
+glowPulse 2s infinite alternate;
+}
+
+@keyframes slideFromLeftFarBounce{
+0%{
+transform:translateX(-300px);
+opacity:0;
+}
+70%{
+transform:translateX(15px);
+opacity:1;
+}
+85%{
+transform:translateX(-8px);
+}
+100%{
+transform:translateX(0);
+}
+}
+
+.promo table{
+width:100%;
+border-collapse:collapse;
+font-size:16px;
+}
+
+.promo th{
+background:#1d4c84;
+color:#FFD700;
+padding:10px;
+border:1px solid #ffffff33;
+}
+
+.promo td{
+padding:10px;
+border:1px solid #ffffff22;
+text-align:center;
+}
+
+.promo tr:nth-child(even){background:#1b4475;}
+.promo tr:nth-child(odd){background:#163d6b;}
+
+.highlight-rate{
+color:#FFD700;
+font-weight:bold;
+text-shadow:
+0 0 5px #FFD700,
+0 0 10px #FFD700,
+0 0 20px rgba(255,215,0,0.8);
+animation:goldPulse 2s infinite;
+}
+
+@keyframes goldPulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+
+/* MINI LOKET */
+.mini{
+display:flex;
+gap:12px;
+padding:6px 20px;
+height:60px;
+align-items:center;
+background:#0e2f5a;
+box-shadow:0 -3px 10px rgba(0,0,0,0.4);
+}
+
+.loket{
+flex:1;
+background:linear-gradient(145deg,#163d6b,#0f2f55);
+border-radius:25px;
+padding:5px 10px;
+text-align:center;
+display:flex;
+flex-direction:column;
+justify-content:center;
+box-shadow:inset 0 2px 4px rgba(255,255,255,0.1),
+0 3px 8px rgba(0,0,0,0.5);
+}
+
+.loket h3{
+margin:0;
+font-size:14px;
+font-weight:600;
+letter-spacing:1px;
+color:#cfd8ff;
+}
+
+.loket span{
+font-size:24px;
+color:#FFD700;
+font-weight:bold;
+text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;
+}
+
+.active-loket{
+animation:pulse 1.2s ease-in-out 3;
+border:2px solid #FFD700;
+box-shadow:0 0 10px #FFD700,0 0 20px rgba(255,215,0,0.8);
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.05);}
+100%{transform:scale(1);}
+}
+
+.blink{
+animation:blinkAnim 0.6s ease-in-out 3;
+}
+
+@keyframes blinkAnim{
+0%{opacity:1;}
+50%{opacity:0.3;}
+100%{opacity:1;}
+}
+
+/* RUNNING TEXT */
+.running{
+background:#0a2445;
+color:yellow;
+font-size:16px;
+padding:10px;
+white-space:nowrap;
+overflow:hidden;
+}
+
+.running div{
+display:inline-block;
+padding-left:100%;
+animation:jalan 20s linear infinite;
+}
+
+@keyframes jalan{
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
+}
+
+/* AUDIO UNLOCK */
+#unlock{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000c;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
 </style>
 </head>
 
 <body>
 
 <div id="unlock">
-<button onclick="aktifkanSuara()" style="font-size:30px;padding:20px 40px;background:gold;border:none;border-radius:15px;">
+<button onclick="aktifkanSuara()" style="font-size:30px;padding:20px 40px;background:gold;border:none;border-radius:15px;cursor:pointer;">
 🔊 AKTIFKAN SUARA
 </button>
 </div>
@@ -65,7 +337,13 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 </div>
 
 <div class="promo">
-<img src="promo1.png" class="promo-img">
+<table>
+<tr><th>NOMINAL DEPOSITO</th><th>RATE</th></tr>
+<tr><td>1 jt - ≤ 100 jt</td><td>5,00 %</td></tr>
+<tr><td>100 jt keatas - < 500 jt</td><td>5,25 %</td></tr>
+<tr><td>500 jt keatas</td><td class="highlight-rate">5,50 %</td></tr>
+</table>
+<img src="promo1.png" class="promo-img" id="promoImage">
 </div>
 
 </div>
@@ -78,7 +356,7 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 </div>
 
 <div class="running">
-<div>Selamat datang di Bank Prima Nadi • Mohon menunggu nomor antrian Anda</div>
+<div id="runningTextTV">Selamat datang di Bank Prima Nadi KPO Cakranegara • Mohon menunggu nomor antrian Anda dipanggil. Terima kasih</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -86,7 +364,7 @@ body{margin:0;font-family:Arial;background:#0b2d57;color:white;}
 
 <script>
 const firebaseConfig = {
-apiKey:"AIzaSy...",
+apiKey:"AIzaSyB7f2r5KbTkk-14bc5cXNHEVlV5J1WfMf8",
 authDomain:"antrian-bank-prima-nadi.firebaseapp.com",
 databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.firebasedatabase.app",
 projectId:"antrian-bank-prima-nadi"
@@ -94,29 +372,41 @@ projectId:"antrian-bank-prima-nadi"
 
 const audioBase="https://raw.githubusercontent.com/prima-com/antrian-bank-prima-nadi/main/audio/";
 
-let audioAktif=false;
-let lastCalled={};
-let audioQueue=Promise.resolve();
-
 function playAudio(file){
 return new Promise(resolve=>{
-const a=new Audio(audioBase+file);
-a.load();
-a.onended=()=>setTimeout(resolve,200);
-a.onerror=()=>resolve();
-a.play().catch(()=>resolve());
+
+const audio=new Audio(audioBase+file);
+audio.volume = 1.0;
+
+audio.onended = ()=>{
+setTimeout(resolve, 150);
+};
+
+audio.onerror = ()=>{
+console.log("Audio gagal:", file);
+resolve();
+};
+
+audio.play().catch(err=>{
+console.log("Play error:", err);
+resolve();
+});
+
 });
 }
 
-function panggilAntrian(nomor,loket){
-audioQueue=audioQueue.then(async()=>{
+async function panggilAntrian(nomor,loket){
+
 if(!audioAktif) return;
 
 const huruf=nomor.charAt(0);
 const angka=nomor.substring(1).split("");
 
 await playAudio("ding.mp3");
+await new Promise(r=>setTimeout(r,200));
+
 await playAudio("nomor_antrian.mp3");
+
 await playAudio(huruf+".mp3");
 
 for(let a of angka){
@@ -124,18 +414,35 @@ await playAudio(a+".mp3");
 }
 
 await playAudio("silakan_menuju.mp3");
+
 await playAudio(loket+".mp3");
-});
+
 }
+
+  
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+let audioAktif=false;
+let lastCalled={};
 
 function aktifkanSuara(){
 audioAktif=true;
-new Audio(audioBase+"ding.mp3").play().catch(()=>{});
+
+// trigger unlock audio Android TV
+const a = new Audio(audioBase+"ding.mp3");
+a.play().catch(()=>{});
+
+speechSynthesis.speak(
+new SpeechSynthesisUtterance("Sistem suara aktif")
+);
+
 document.getElementById("unlock").style.display="none";
 }
 
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+function formatBaca(nomor,loket){
+return "Nomor antrian "+nomor+" silakan menuju "+loket.replace("loket","loket ");
+}
 
 function listenLoket(id){
 db.ref("loket/"+id).on("value",(snap)=>{
@@ -143,9 +450,26 @@ const data=snap.val();
 if(!data) return;
 
 const nomor=data.nomor;
+const loketBox=document.getElementById(id).parentElement;
+
 document.getElementById(id).innerText=nomor;
 
+if(nomor.startsWith("A")){
+document.getElementById("displayA").innerText = nomor;
+}
+if(nomor.startsWith("B")){
+document.getElementById("displayB").innerText = nomor;
+}
+
 if(lastCalled[id]!==data.waktu){
+loketBox.classList.add("active-loket");
+document.getElementById(id).classList.add("blink");
+
+setTimeout(()=>{
+loketBox.classList.remove("active-loket");
+document.getElementById(id).classList.remove("blink");
+},2500);
+
 panggilAntrian(nomor,id);
 lastCalled[id]=data.waktu;
 }
@@ -160,10 +484,89 @@ listenLoket("loket4");
 function updateJam(){
 const now=new Date();
 document.getElementById("jam").innerHTML=
-now.toLocaleDateString("id-ID")+"<br>"+now.toLocaleTimeString("id-ID");
+now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+
+"<br>Pukul "+now.toLocaleTimeString("id-ID");
 }
 setInterval(updateJam,1000);
 updateJam();
+
+/* AUTO ROTATE GAMBAR FINAL */
+const promoImages=["promo1.png","promo2.png","promo3.png"];
+let promoIndex=0;
+const promoEl=document.getElementById("promoImage");
+
+setInterval(()=>{
+promoEl.classList.remove("slide-in","slide-in-far");
+promoEl.style.opacity=0;
+
+setTimeout(()=>{
+promoIndex=(promoIndex+1)%promoImages.length;
+promoEl.src=promoImages[promoIndex];
+
+if(promoImages[promoIndex]==="promo2.png"){
+promoEl.classList.add("slide-in");
+}
+else if(promoImages[promoIndex]==="promo3.png"){
+promoEl.classList.add("slide-in-far");
+}
+else{
+promoEl.style.opacity=1;
+}
+
+},800);
+
+},5000);
+
+
+/* SINKRON TV DISPLAY DARI ADMIN */
+
+db.ref("displayConfig").on("value",snap=>{
+
+const data=snap.val();
+if(!data) return;
+
+/* RUNNING TEXT */
+
+if(data.runningText){
+document.getElementById("runningTextTV").innerText=data.runningText;
+}
+
+/* YOUTUBE VIDEO */
+
+if(data.youtube){
+
+let video=data.youtube;
+
+/* jika admin paste link youtube normal */
+
+if(video.includes("watch?v=")){
+video=video.split("watch?v=")[1];
+}
+
+if(video.includes("youtu.be/")){
+video=video.split("youtu.be/")[1];
+}
+
+/* ubah ke embed */
+
+const embed="https://www.youtube.com/embed/"+video+"?autoplay=1&mute=1";
+
+document.getElementById("youtubeFrame").src=embed;
+
+}
+
+});
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 </body>
