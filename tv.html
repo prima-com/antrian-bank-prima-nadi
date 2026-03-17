@@ -379,7 +379,7 @@ const audio=new Audio(audioBase+file);
 audio.volume = 1.0;
 
 audio.onended = ()=>{
-setTimeout(resolve, 150);
+setTimeout(resolve, 300);
 };
 
 audio.onerror = ()=>{
@@ -399,25 +399,34 @@ async function panggilAntrian(nomor,loket){
 
 if(!audioAktif) return;
 
-const huruf=nomor.charAt(0);
-const angka=nomor.substring(1).split("");
+const huruf = nomor.charAt(0);
+const angka = nomor.substring(1).split("");
 
 await playAudio("ding.mp3");
-await new Promise(r=>setTimeout(r,200));
+await delay(400);
 
 await playAudio("nomor_antrian.mp3");
+await delay(300);
 
-await playAudio(huruf+".mp3");
+await playAudio(huruf + ".mp3");
+await delay(300);
 
 for(let a of angka){
-await playAudio(a+".mp3");
+await playAudio(a + ".mp3");
+await delay(250);
 }
 
 await playAudio("silakan_menuju.mp3");
+await delay(300);
 
-await playAudio(loket+".mp3");
+// pakai versi lengkap biar jelas
+await playAudio(loket + ".mp3");
 
 }
+
+function delay(ms){
+return new Promise(resolve => setTimeout(resolve, ms));
+}  
 
   
 firebase.initializeApp(firebaseConfig);
