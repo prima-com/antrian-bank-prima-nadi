@@ -370,6 +370,40 @@ databaseURL:"https://antrian-bank-prima-nadi-default-rtdb.asia-southeast1.fireba
 projectId:"antrian-bank-prima-nadi"
 };
 
+const audioBase="audio/";
+
+function playAudio(file){
+return new Promise(resolve=>{
+const a=new Audio(audioBase+file);
+a.onended=resolve;
+a.play();
+});
+}
+
+async function panggilAntrian(nomor,loket){
+
+if(!audioAktif) return;
+
+const huruf=nomor.charAt(0);
+const angka=nomor.substring(1).split("");
+
+await playAudio("ding.mp3");
+
+await playAudio("nomor_antrian.mp3");
+
+await playAudio(huruf+".mp3");
+
+for(let a of angka){
+await playAudio(a+".mp3");
+}
+
+await playAudio("silakan_menuju.mp3");
+
+await playAudio(loket+".mp3");
+
+}
+
+  
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
@@ -380,16 +414,6 @@ function aktifkanSuara(){
 audioAktif=true;
 speechSynthesis.speak(new SpeechSynthesisUtterance("Sistem suara aktif"));
 document.getElementById("unlock").style.display="none";
-}
-
-function speak(text){
-if(!audioAktif) return;
-speechSynthesis.cancel();
-setTimeout(()=>{
-const msg=new SpeechSynthesisUtterance(text);
-msg.lang="id-ID";
-speechSynthesis.speak(msg);
-},100);
 }
 
 function formatBaca(nomor,loket){
@@ -422,7 +446,7 @@ loketBox.classList.remove("active-loket");
 document.getElementById(id).classList.remove("blink");
 },2500);
 
-speak(formatBaca(nomor,id));
+panggilAntrian(nomor,id);
 lastCalled[id]=data.waktu;
 }
 });
